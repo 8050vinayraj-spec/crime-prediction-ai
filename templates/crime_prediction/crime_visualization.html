@@ -1,0 +1,15 @@
+{% extends "base.html" %}{% block title %}Crime Charts{% endblock %}
+{% block content %}
+<h2 class="text-primary mb-4">Crime Type Distribution</h2>
+<div class="row"><div class="col-md-8">
+  <canvas id="crimeChart"></canvas>
+</div></div>
+<script>
+  new Chart(document.getElementById('crimeChart'), {
+    type: 'bar',
+    data: { labels: {{ labels|safe }},
+      datasets: [{ label: 'Crime Count', data: {{ counts|safe }},
+        backgroundColor: ['#ef5350','#42a5f5','#66bb6a','#ffa726','#ab47bc'] }] },
+    options: { responsive: true }
+  });
+</script>{% endblock %}

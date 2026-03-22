@@ -1,0 +1,14 @@
+{% extends "base.html" %}{% block title %}Crime Prediction{% endblock %}
+{% block content %}
+<h2 class="text-primary mb-4">Crime Prediction</h2>
+<div class="row"><div class="col-md-6">
+<form method="POST" action="{% url 'crime_result' %}">{% csrf_token %}
+  <div class="mb-3"><label class="form-label">Year</label>
+  <input type="number" name="year" class="form-control" value="2024" min="2000" max="2030" required></div>
+  <div class="mb-3"><label class="form-label">Month (1–12)</label>
+  <input type="number" name="month" class="form-control" min="1" max="12" required></div>
+  <div class="mb-3"><label class="form-label">Location Code</label>
+  <input type="number" name="location" class="form-control" min="1" required>
+  <div class="form-text">e.g. 1=Chennai, 2=Mumbai, 3=Delhi ...</div></div>
+  <button type="submit" class="btn btn-danger px-5">Predict Crime</button>
+</form></div></div>{% endblock %}

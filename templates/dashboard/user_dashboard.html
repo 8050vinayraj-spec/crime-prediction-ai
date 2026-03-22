@@ -1,0 +1,20 @@
+{% extends "base.html" %}{% block content %}
+<h2 class="mb-4">Cybercrime Detection Log & Charts</h2>
+<div class="row mb-4"><div class="col-md-5">
+  <canvas id="cyberLogChart"></canvas>
+</div></div>
+<table class="table table-striped table-bordered">
+  <thead class="table-dark"><tr><th>User</th><th>Result</th><th>Time</th></tr></thead>
+  <tbody>{% for log in recent %}
+  <tr><td>{{ log.user.username }}</td><td>{{ log.result }}</td>
+    <td>{{ log.timestamp|date:"d M Y H:i" }}</td></tr>
+  {% endfor %}</tbody>
+</table>
+<script>
+  new Chart(document.getElementById('cyberLogChart'), {
+    type: 'doughnut',
+    data: { labels: {{ labels|safe }},
+      datasets: [{ data: {{ counts|safe }},
+        backgroundColor: ['#ef5350','#66bb6a'] }] }
+  });
+</script>{% endblock %}

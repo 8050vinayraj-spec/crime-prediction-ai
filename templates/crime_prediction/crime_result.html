@@ -1,0 +1,16 @@
+{% extends "base.html" %}{% block title %}Crime Result{% endblock %}
+{% block content %}
+<div class="text-center mt-4">
+  <h2 class="text-danger mb-3">Prediction Result</h2>
+  <div class="card border-danger mx-auto" style="max-width:480px;">
+    <div class="card-body py-4">
+      <p class="text-muted mb-1">Year: {{ year }} | Month: {{ month }} | Location: {{ location }}</p>
+      <h4 class="mt-2">Predicted Crime Type</h4>
+      <h2 class="text-danger fw-bold">{{ result }}</h2>
+    </div>
+  </div>
+  <div class="mt-4 d-flex justify-content-center gap-3">
+    <a href="{% url 'crime_home' %}" class="btn btn-outline-primary">Predict Again</a>
+    <a href="{% url 'crime_visualization' %}" class="btn btn-outline-secondary">View Charts</a>
+  </div>
+</div>{% endblock %}
