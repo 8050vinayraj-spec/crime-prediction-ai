@@ -37,6 +37,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'accounts',
+    'crime_prediction',
+    'cybercrime',
+    'visualization',
+    'dashboard',
+
 ]
 
 MIDDLEWARE = [
@@ -54,8 +60,8 @@ ROOT_URLCONF = 'crime_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+        'DIRS': [BASE_DIR / 'templates'],   # ← changed
+        'APP_DIRS': False,                  # ← changed
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',
@@ -67,6 +73,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'crime_project.wsgi.application'
+
+AUTH_USER_MODEL = 'accounts.CustomUser' 
 
 
 # Database
@@ -110,8 +118,14 @@ USE_I18N = True
 
 USE_TZ = True
 
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']  # ← added
 
+LOGIN_URL = '/accounts/login/'             # ← added
+LOGIN_REDIRECT_URL = '/dashboard/user/' 
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+
