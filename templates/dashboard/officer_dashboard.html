@@ -1,0 +1,18 @@
+{% extends "base.html" %}{% block content %}
+<h2 class="text-primary">Officer Dashboard</h2>
+<div class="row mt-3 mb-4 g-3">
+  <div class="col-md-3"><div class="card text-center p-3 bg-primary text-white">
+    <h3>{{ total_users }}</h3><p class="mb-0">Total Users</p></div></div>
+  <div class="col-md-3"><div class="card text-center p-3 bg-success text-white">
+    <h3>{{ total_preds }}</h3><p class="mb-0">Total Predictions</p></div></div>
+  <div class="col-md-3"><div class="card text-center p-3 bg-warning">
+    <h3>{{ pending }}</h3><p class="mb-0">Pending Approvals</p></div></div>
+</div>
+<h5>Recent System Predictions</h5>
+<table class="table table-striped table-bordered">
+  <thead class="table-dark"><tr><th>User</th><th>Module</th><th>Result</th><th>Time</th></tr></thead>
+  <tbody>{% for p in recent_preds %}
+  <tr><td>{{ p.user.username }}</td><td>{{ p.module }}</td>
+    <td>{{ p.result }}</td><td>{{ p.timestamp|date:"d M Y H:i" }}</td></tr>
+  {% endfor %}</tbody>
+</table>{% endblock %}
