@@ -12,3 +12,6 @@ class CyberModel(models.Model):
     algorithm  = models.CharField(max_length=100)
     accuracy   = models.FloatField()
     trained_on = models.DateTimeField(auto_now_add=True)
+
+
+# Create your models her
