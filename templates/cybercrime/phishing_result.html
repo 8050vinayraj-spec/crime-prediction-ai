@@ -1,20 +1,28 @@
-{% extends "base.html" %}{% block title %}Detection Result{% endblock %}
+{% extends "base.html" %}
+{% block title %}Detection Result{% endblock %}
 {% block content %}
-<div class="text-center mt-4">
+
+<div class="text-center mt-5">
   <h2 class="mb-3">Detection Result</h2>
+  <p class="text-muted">Analysed URL: <strong>{{ url }}</strong></p>
+
   {% if is_phishing %}
-    <div class="alert alert-danger mx-auto" style="max-width:480px;">
-      <h3>⚠️ PHISHING DETECTED</h3>
-      <p>This URL is classified as a <strong>phishing threat</strong>. Do not proceed.</p>
+    <div class="alert alert-danger mx-auto mt-4" style="max-width:520px;">
+      <h3 class="fw-bold">⚠️ PHISHING DETECTED</h3>
+      <p class="mb-0">This URL is classified as a <strong>phishing threat</strong>. Do not click or proceed.</p>
     </div>
   {% else %}
-    <div class="alert alert-success mx-auto" style="max-width:480px;">
-      <h3>✅ LEGITIMATE</h3>
-      <p>This URL appears to be <strong>safe and legitimate</strong>.</p>
+    <div class="alert alert-success mx-auto mt-4" style="max-width:520px;">
+      <h3 class="fw-bold">✅ LEGITIMATE</h3>
+      <p class="mb-0">This URL appears to be <strong>safe and legitimate</strong>.</p>
     </div>
   {% endif %}
+
   <div class="mt-4 d-flex justify-content-center gap-3">
-    <a href="{% url 'phishing_home' %}" class="btn btn-outline-warning">Analyse Another</a>
+    <a href="{% url 'phishing_home' %}" class="btn btn-outline-warning">Analyse Another URL</a>
     <a href="{% url 'phishing_visualization' %}" class="btn btn-outline-secondary">View Charts</a>
+    <a href="{% url 'user_dashboard' %}" class="btn btn-outline-primary">Dashboard</a>
   </div>
-</div>{% endblock %}
+</div>
+
+{% endblock %}

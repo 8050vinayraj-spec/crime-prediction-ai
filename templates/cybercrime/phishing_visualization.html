@@ -1,20 +1,60 @@
-{% extends "base.html" %}{% block title %}Detection Result{% endblock %}
+{% extends "base.html" %}
+{% block title %}Cyber Charts{% endblock %}
 {% block content %}
-<div class="text-center mt-4">
-  <h2 class="mb-3">Detection Result</h2>
-  {% if is_phishing %}
-    <div class="alert alert-danger mx-auto" style="max-width:480px;">
-      <h3>⚠️ PHISHING DETECTED</h3>
-      <p>This URL is classified as a <strong>phishing threat</strong>. Do not proceed.</p>
+
+<h2 class="text-warning mb-4">Phishing Detection Distribution</h2>
+
+<div class="row">
+  <div class="col-md-5">
+    <div class="card p-3">
+      <canvas id="cyberPie"></canvas>
     </div>
-  {% else %}
-    <div class="alert alert-success mx-auto" style="max-width:480px;">
-      <h3>✅ LEGITIMATE</h3>
-      <p>This URL appears to be <strong>safe and legitimate</strong>.</p>
-    </div>
-  {% endif %}
-  <div class="mt-4 d-flex justify-content-center gap-3">
-    <a href="{% url 'phishing_home' %}" class="btn btn-outline-warning">Analyse Another</a>
-    <a href="{% url 'phishing_visualization' %}" class="btn btn-outline-secondary">View Charts</a>
   </div>
-</div>{% endblock %}
+  <div class="col-md-5">
+    <div class="card p-3">
+      <canvas id="cyberBar"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+  const labels = {{ labels|safe }};
+  const counts = {{ counts|safe }};
+
+  new Chart(document.getElementById('cyberPie'), {
+    type: 'pie',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: counts,
+        backgroundColor: ['#ef5350', '#66bb6a'],
+        borderWidth: 2,
+        borderColor: '#fff'
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { position: 'bottom' } }
+    }
+  });
+
+  new Chart(document.getElementById('cyberBar'), {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Detection Count',
+        data: counts,
+        backgroundColor: ['#ef5350', '#66bb6a'],
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+</script>
+
+{% endblock %}

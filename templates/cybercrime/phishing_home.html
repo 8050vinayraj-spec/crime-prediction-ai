@@ -1,17 +1,26 @@
-{% extends "base.html" %}{% block title %}Cybercrime Detection{% endblock %}
+{% extends "base.html" %}
+{% block title %}Cybercrime Detection{% endblock %}
 {% block content %}
-<h2 class="text-warning mb-4">Cybercrime / Phishing Detection</h2>
-<div class="row"><div class="col-md-6">
-<form method="POST" action="{% url 'phishing_result' %}">{% csrf_token %}
-  <div class="mb-3"><label class="form-label">URL Length (characters)</label>
-  <input type="number" name="url_length" class="form-control" min="1" required></div>
-  <div class="mb-3 form-check">
-  <input type="checkbox" name="has_ip" value="1" class="form-check-input" id="hasIp">
-  <label class="form-check-label" for="hasIp">URL Contains an IP Address</label></div>
-  <div class="mb-3"><label class="form-label">Suspicious Keyword Count</label>
-  <input type="number" name="suspicious_keywords" class="form-control" min="0" required></div>
-  <div class="mb-3 form-check">
-  <input type="checkbox" name="has_https" value="1" class="form-check-input" id="hasHttps" checked>
-  <label class="form-check-label" for="hasHttps">URL Uses HTTPS</label></div>
-  <button type="submit" class="btn btn-warning px-5">Detect Threat</button>
-</form></div></div>{% endblock %}
+
+<div class="row justify-content-center mt-4">
+  <div class="col-md-7">
+    <div class="card p-4">
+      <h2 class="text-warning mb-2">🔍 Cybercrime / Phishing Detection</h2>
+      <p class="text-muted mb-4">Enter any URL below to check if it is a phishing threat or legitimate.</p>
+      <form method="POST" action="{% url 'phishing_result' %}">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label fw-bold">URL to Analyse</label>
+          <input type="url" name="url" class="form-control form-control-lg"
+                 placeholder="https://example.com" required>
+          <div class="form-text">Example: https://google.com or http://free-prize-click.com</div>
+        </div>
+        <button type="submit" class="btn btn-warning px-5 fw-bold">
+          Detect Threat
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
