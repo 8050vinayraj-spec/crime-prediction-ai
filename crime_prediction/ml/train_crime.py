@@ -23,3 +23,4 @@ save = os.path.dirname(__file__)
 joblib.dump(model, os.path.join(save, 'crime_model.pkl'))
 joblib.dump(le,    os.path.join(save, 'label_encoder.pkl'))
 print('Saved crime_model.pkl and label_encoder.pkl')
+
