@@ -1,0 +1,28 @@
+{% extends "base.html" %}{% block title %}WHOIS Lookup{% endblock %}
+{% block content %}
+<div class="row justify-content-center mt-4"><div class="col-md-7">
+<div class="card p-4">
+<h2 class="text-success mb-2">🔎 Domain WHOIS Lookup</h2>
+<p class="text-muted">Find registration details for any domain.</p>
+<form method="POST">{% csrf_token %}
+  <div class="mb-3"><label class="form-label fw-bold">Domain Name</label>
+    <input type="text" name="domain" class="form-control"
+           placeholder="example.com" required></div>
+  <button type="submit" class="btn btn-success px-5">Lookup Domain</button>
+</form></div>
+{% if error %}<div class="alert alert-danger mt-3">{{ error }}</div>{% endif %}
+{% if result %}
+<div class="card mt-4 p-4">
+  <h5>WHOIS Results: <strong>{{ result.domain }}</strong></h5>
+  <table class="table table-bordered mt-3">
+    <tr><th>Registrar</th><td>{{ result.registrar }}</td></tr>
+    <tr><th>Created</th><td>{{ result.created }}</td></tr>
+    <tr><th>Expires</th><td>{{ result.expires }}</td></tr>
+    <tr><th>Last Updated</th><td>{{ result.updated }}</td></tr>
+    <tr><th>Country</th><td>{{ result.country }}</td></tr>
+    <tr><th>Name Servers</th><td>{{ result.name_servers|join:", " }}</td></tr>
+    <tr><th>Contact Email</th><td>{{ result.emails }}</td></tr>
+  </table>
+</div>{% endif %}
+</div></div>{% endblock %}
+ 

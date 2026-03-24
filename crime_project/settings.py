@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'dashboard',
 
 ]
+NEWS_API_KEY = 'your_newsapi_key_here'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -60,8 +61,8 @@ ROOT_URLCONF = 'crime_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],   # ← changed
-        'APP_DIRS': False,                  # ← changed
+        'DIRS': [BASE_DIR / 'templates'],
+        'APP_DIRS': True,        # ← change back to True
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',

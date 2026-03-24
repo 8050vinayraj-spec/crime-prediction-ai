@@ -4,15 +4,22 @@ from django.contrib.auth.decorators import login_required
 from .models import CustomUser, AccountApproval, LoginActivity
 
 def signup_view(request):
+    error = None
     if request.method == 'POST':
         username = request.POST['username']
         email    = request.POST['email']
         password = request.POST['password']
-        user = CustomUser.objects.create_user(
-            username=username, email=email, password=password, role='USER')
-        AccountApproval.objects.create(user=user, status='PENDING')
-        return redirect('approval_pending')
-    return render(request, 'accounts/signup.html')
+        
+        # Check if username already exists
+        if CustomUser.objects.filter(username=username).exists():
+            error = 'Username already taken. Please choose another.'
+        else:
+            user = CustomUser.objects.create_user(
+                username=username, email=email, password=password, role='USER')
+            AccountApproval.objects.create(user=user, status='PENDING')
+            return redirect('approval_pending')
+    
+    return render(request, 'accounts/signup.html', {'error': error})
 
 def login_view(request):
     error = None

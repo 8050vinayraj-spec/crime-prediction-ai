@@ -1,0 +1,7 @@
+{% extends "base.html" %}{% block title %}Crime Heatmap{% endblock %}
+{% block content %}
+<h2 class="text-danger mb-4">🗺️ Crime Prediction Heatmap</h2>
+<div class="card p-2">
+  {{ map_html|safe }}
+</div>{% endblock %}
+ 

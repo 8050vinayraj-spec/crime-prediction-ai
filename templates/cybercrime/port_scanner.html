@@ -1,0 +1,27 @@
+{% extends "base.html" %}{% block title %}Port Scanner{% endblock %}
+{% block content %}
+<div class="row justify-content-center mt-4"><div class="col-md-7">
+<div class="card p-4">
+<h2 class="text-danger mb-2">🔌 Network Port Scanner</h2>
+<p class="text-muted">Scan common ports on any domain or IP address.</p>
+<form method="POST">{% csrf_token %}
+  <div class="mb-3"><label class="form-label fw-bold">Target Domain or IP</label>
+    <input type="text" name="target" class="form-control"
+           placeholder="example.com or 192.168.1.1" required></div>
+  <button type="submit" class="btn btn-danger px-5">Scan Ports</button>
+</form></div>
+{% if error %}<div class="alert alert-danger mt-3">{{ error }}</div>{% endif %}
+{% if result %}
+<div class="card mt-4 p-4">
+  <h5>Scan Results for: <strong>{{ result.target }}</strong></h5>
+  <p>Open Ports: <strong class="text-danger">{{ result.open_count }}</strong></p>
+  <table class="table table-bordered">
+    <thead class="table-dark"><tr><th>Port</th><th>Service</th><th>Status</th></tr></thead>
+    <tbody>{% for p in result.ports %}
+    <tr><td>{{ p.port }}</td><td>{{ p.name }}</td>
+      <td><span class="badge bg-{{ p.color }}">{{ p.status }}</span></td></tr>
+    {% endfor %}</tbody>
+  </table>
+</div>{% endif %}
+</div></div>{% endblock %}
+ 

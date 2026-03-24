@@ -1,0 +1,33 @@
+{% extends "base.html" %}{% block title %}File Scanner{% endblock %}
+{% block content %}
+<div class="row justify-content-center mt-4"><div class="col-md-7">
+<div class="card p-4">
+<h2 class="text-warning mb-2">📁 File Hash Scanner</h2>
+<p class="text-muted">Upload a file to check its hash and scan for malware.</p>
+<form method="POST" enctype="multipart/form-data">{% csrf_token %}
+  <div class="mb-3"><label class="form-label fw-bold">Upload File</label>
+    <input type="file" name="file" class="form-control" required></div>
+  <button type="submit" class="btn btn-warning px-5">Scan File</button>
+</form></div>
+{% if result %}
+<div class="card mt-4 p-4">
+  <h5>File: {{ result.filename }} ({{ result.size }} bytes)</h5>
+  <table class="table table-bordered mt-3">
+    <tr><th>MD5</th><td class="text-break">{{ result.md5 }}</td></tr>
+    <tr><th>SHA256</th><td class="text-break">{{ result.sha256 }}</td></tr>
+  </table>
+  {% if result.vt %}
+  <h6 class="mt-3">VirusTotal Results:</h6>
+  <div class="row g-2">
+    <div class="col-3"><div class="card text-center p-2 bg-danger text-white">
+      <h4>{{ result.vt.malicious }}</h4><small>Malicious</small></div></div>
+    <div class="col-3"><div class="card text-center p-2 bg-warning">
+      <h4>{{ result.vt.suspicious }}</h4><small>Suspicious</small></div></div>
+    <div class="col-3"><div class="card text-center p-2 bg-success text-white">
+      <h4>{{ result.vt.harmless }}</h4><small>Harmless</small></div></div>
+    <div class="col-3"><div class="card text-center p-2 bg-secondary text-white">
+      <h4>{{ result.vt.undetected }}</h4><small>Undetected</small></div></div>
+  </div>{% endif %}
+</div>{% endif %}
+</div></div>{% endblock %}
+ 
