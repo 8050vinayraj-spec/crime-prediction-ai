@@ -1,0 +1,34 @@
+{% extends "base.html" %}{% block title %}Breach Monitor{% endblock %}
+{% block content %}
+<div class="row justify-content-center mt-4"><div class="col-md-7">
+<div class="card p-4">
+<h2 class="text-dark mb-2">🕵️ Dark Web Breach Monitor</h2>
+<p class="text-muted">Check if your email has appeared in any data breaches.</p>
+<form method="POST">{% csrf_token %}
+  <div class="mb-3"><label class="form-label fw-bold">Email Address</label>
+    <input type="email" name="email" class="form-control"
+           placeholder="you@example.com" required></div>
+  <button type="submit" class="btn btn-dark px-5">Check Breaches</button>
+</form></div>
+{% if error %}<div class="alert alert-danger mt-3">{{ error }}</div>{% endif %}
+{% if result %}
+<div class="card mt-4 p-4">
+  {% if result.found %}
+  <div class="alert alert-danger">
+    ⚠️ <strong>{{ result.email }}</strong> found in
+    <strong>{{ result.count }}</strong> breaches!</div>
+  <div class="row g-2 mt-2">
+  {% for breach in result.breaches %}
+  <div class="col-md-6"><div class="card p-3 border-danger">
+    <h6 class="text-danger">{{ breach.Name }}</h6>
+    <small>Date: {{ breach.BreachDate }}</small><br>
+    <small>Data: {{ breach.DataClasses|join:", "|truncatechars:60 }}</small>
+  </div></div>
+  {% endfor %}
+  </div>
+  {% else %}
+  <div class="alert alert-success">
+    ✅ Good news! <strong>{{ result.email }}</strong> was not found in any breaches.
+  </div>{% endif %}
+</div>{% endif %}
+</div></div>{% endblock %}

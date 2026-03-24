@@ -1,0 +1,39 @@
+{% extends "base.html" %}{% block title %}SSL Checker{% endblock %}
+{% block content %}
+<div class="row justify-content-center mt-4">
+<div class="col-md-7">
+<div class="card p-4">
+<h2 class="text-primary mb-2">🔒 SSL Certificate Checker</h2>
+<p class="text-muted">Check if a website has a valid SSL certificate.</p>
+<form method="POST">{% csrf_token %}
+  <div class="mb-3">
+    <label class="form-label fw-bold">Domain Name</label>
+    <input type="text" name="domain" class="form-control"
+           placeholder="google.com" required>
+  </div>
+  <button type="submit" class="btn btn-primary px-5">Check SSL</button>
+</form>
+</div>
+{% if error %}
+<div class="alert alert-danger mt-3">{{ error }}</div>
+{% endif %}
+{% if result %}
+<div class="card mt-4 p-4">
+  <h4>Results for: <strong>{{ result.domain }}</strong></h4>
+  <table class="table table-bordered mt-3">
+    <tr><th>Status</th>
+      <td>{% if result.valid %}
+        <span class="badge bg-success">✅ Valid</span>
+      {% else %}
+        <span class="badge bg-danger">❌ Expired</span>
+      {% endif %}</td></tr>
+    <tr><th>Issued To</th><td>{{ result.issued_to }}</td></tr>
+    <tr><th>Issued By</th><td>{{ result.issued_by }}</td></tr>
+    <tr><th>Expires On</th><td>{{ result.expires }}</td></tr>
+    <tr><th>Days Remaining</th>
+      <td><strong>{{ result.days_left }} days</strong></td></tr>
+  </table>
+</div>
+{% endif %}
+</div></div>{% endblock %}
+ 

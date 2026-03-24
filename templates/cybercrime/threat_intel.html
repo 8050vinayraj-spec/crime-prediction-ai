@@ -1,0 +1,22 @@
+{% extends "base.html" %}{% block title %}Threat Intelligence{% endblock %}
+{% block content %}
+<h2 class="text-danger mb-4">🛡️ Live Threat Intelligence Feed</h2>
+{% if error %}<div class="alert alert-warning">{{ error }}</div>{% endif %}
+<div class="row g-3">
+{% for article in articles %}
+<div class="col-md-4">
+  <div class="card h-100 p-3">
+    <h6 class="fw-bold">{{ article.title|truncatechars:80 }}</h6>
+    <p class="text-muted small">{{ article.description|truncatechars:120 }}</p>
+    <div class="mt-auto">
+      <small class="text-muted">{{ article.publishedAt|slice:":10" }}</small><br>
+      <a href="{{ article.url }}" target="_blank"
+         class="btn btn-outline-danger btn-sm mt-2">Read More</a>
+    </div>
+  </div>
+</div>
+{% empty %}
+<div class="col-12"><p>No articles found.</p></div>
+{% endfor %}
+</div>{% endblock %}
+ 

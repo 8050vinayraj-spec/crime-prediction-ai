@@ -1,0 +1,33 @@
+{% extends "base.html" %}{% block title %}Email Analyser{% endblock %}
+{% block content %}
+<div class="row justify-content-center mt-4"><div class="col-md-8">
+<div class="card p-4">
+<h2 class="text-primary mb-2">📧 Email Header Analyser</h2>
+<p class="text-muted">Paste raw email headers to detect spoofing and phishing.</p>
+<form method="POST">{% csrf_token %}
+  <div class="mb-3"><label class="form-label fw-bold">Raw Email Headers</label>
+    <textarea name="headers" class="form-control" rows="8"
+              placeholder="Paste your email headers here..." required></textarea></div>
+  <button type="submit" class="btn btn-primary px-5">Analyse Headers</button>
+</form></div>
+{% if result %}
+<div class="card mt-4 p-4">
+  {% if result.suspicious %}
+  <div class="alert alert-danger">⚠️ Suspicious email detected!</div>
+  {% else %}
+  <div class="alert alert-success">✅ Email appears legitimate.</div>
+  {% endif %}
+  <table class="table table-bordered">
+    <tr><th>From</th><td>{{ result.from }}</td></tr>
+    <tr><th>To</th><td>{{ result.to }}</td></tr>
+    <tr><th>Subject</th><td>{{ result.subject }}</td></tr>
+    <tr><th>Date</th><td>{{ result.date }}</td></tr>
+    <tr><th>SPF</th><td>{{ result.spf }}</td></tr>
+    <tr><th>DKIM</th><td>{{ result.dkim }}</td></tr>
+  </table>
+  {% if result.keywords %}
+  <p class="text-danger">Suspicious keywords found: {{ result.keywords|join:", " }}</p>
+  {% endif %}
+</div>{% endif %}
+</div></div>{% endblock %}
+ 
