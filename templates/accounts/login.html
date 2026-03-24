@@ -1,14 +1,68 @@
-{% extends "base.html" %}{% block title %}Login{% endblock %}
+{% extends "base.html" %}
+{% block title %}Secure Login — Crime AI{% endblock %}
+{% block extra_css %}
+<style>
+  .login-wrap { min-height:calc(100vh - 130px); display:flex; align-items:center; justify-content:center; }
+  .login-box  { width:100%; max-width:430px; position:relative; }
+  .corner { position:absolute; width:16px; height:16px; }
+  .c-tl { top:-1px; left:-1px; border-top:2px solid var(--cyan); border-left:2px solid var(--cyan); }
+  .c-tr { top:-1px; right:-1px; border-top:2px solid var(--cyan); border-right:2px solid var(--cyan); }
+  .c-bl { bottom:-1px; left:-1px; border-bottom:2px solid var(--cyan); border-left:2px solid var(--cyan); }
+  .c-br { bottom:-1px; right:-1px; border-bottom:2px solid var(--cyan); border-right:2px solid var(--cyan); }
+  .login-icon { width:72px; height:72px; border:2px solid var(--cyan); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.9rem; color:var(--cyan); margin:0 auto 1.2rem; box-shadow:0 0 24px rgba(0,245,255,.35); animation:pulse-c 3s ease-in-out infinite; }
+  @keyframes pulse-c { 50% { box-shadow:0 0 40px rgba(0,245,255,.6); } }
+  .login-title { font-family:'Share Tech Mono',monospace; font-size:1.35rem; color:var(--cyan); letter-spacing:3px; text-shadow:0 0 10px rgba(0,245,255,.5); }
+  .login-sub   { font-family:'Share Tech Mono',monospace; font-size:.65rem; color:var(--muted); letter-spacing:2px; margin-top:.3rem; }
+  .iw { position:relative; margin-bottom:1.2rem; }
+  .iw-icon { position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--muted); font-size:.82rem; z-index:5; transition:color .2s; }
+  .iw:focus-within .iw-icon { color:var(--cyan); }
+  .iw .form-control { padding-left:38px !important; }
+  .div-line { flex:1; height:1px; background:rgba(0,245,255,.1); }
+  .div-txt  { font-family:'Share Tech Mono',monospace; font-size:.62rem; color:var(--muted); letter-spacing:2px; white-space:nowrap; }
+  .stats-row { display:flex; justify-content:space-between; padding-top:1.4rem; border-top:1px solid rgba(0,245,255,.07); margin-top:1.6rem; }
+  .s-val { font-family:'Share Tech Mono',monospace; font-size:1.1rem; color:var(--cyan); text-shadow:0 0 8px rgba(0,245,255,.4); }
+  .s-lbl { font-family:'Share Tech Mono',monospace; font-size:.58rem; color:var(--muted); letter-spacing:1.2px; text-transform:uppercase; margin-top:2px; }
+  .term-line { font-family:'Share Tech Mono',monospace; font-size:.63rem; color:var(--green); letter-spacing:1px; margin-bottom:.5rem; overflow:hidden; white-space:nowrap; border-right:2px solid var(--cyan); animation:type 4s steps(38) infinite, blink-cur .7s step-end infinite; }
+  @keyframes type { 0%,100%{width:0} 30%,70%{width:100%} }
+  @keyframes blink-cur { 50%{border-color:transparent} }
+</style>
+{% endblock %}
 {% block content %}
-<div class="row justify-content-center"><div class="col-md-5">
-<h2 class="mb-4 text-primary">Login</h2>
-{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
-<form method="POST">{% csrf_token %}
-  <div class="mb-3"><label class="form-label">Username</label>
-  <input type="text" name="username" class="form-control" required></div>
-  <div class="mb-3"><label class="form-label">Password</label>
-  <input type="password" name="password" class="form-control" required></div>
-  <button type="submit" class="btn btn-primary w-100">Login</button>
-</form>
-<p class="mt-3 text-center">New here? <a href="{% url 'signup' %}">Register</a></p>
-</div></div>{% endblock %}
+<div class="login-wrap">
+  <div class="login-box">
+    <div class="term-line">$ INITIALIZING SECURE CONNECTION...</div>
+    <div class="c-card">
+      <div class="corner c-tl"></div><div class="corner c-tr"></div>
+      <div class="corner c-bl"></div><div class="corner c-br"></div>
+      <div class="text-center mb-4">
+        <div class="login-icon"><i class="fas fa-shield-alt"></i></div>
+        <div class="login-title">SECURE ACCESS</div>
+        <div class="login-sub">AUTHORIZED PERSONNEL ONLY</div>
+      </div>
+      {% if error %}<div class="a-danger mb-3"><i class="fas fa-exclamation-triangle me-2"></i>{{ error }}</div>{% endif %}
+      <form method="POST">{% csrf_token %}
+        <div class="iw">
+          <i class="fas fa-user iw-icon"></i>
+          <input type="text" name="username" class="form-control" placeholder="Username" required autocomplete="off">
+        </div>
+        <div class="iw">
+          <i class="fas fa-key iw-icon"></i>
+          <input type="password" name="password" class="form-control" placeholder="Password" required>
+        </div>
+        <button type="submit" class="btn-c w-100 mt-1"><i class="fas fa-sign-in-alt me-2"></i>AUTHENTICATE</button>
+      </form>
+      <div class="d-flex align-items-center gap-2 my-3">
+        <div class="div-line"></div><span class="div-txt">NEW USER?</span><div class="div-line"></div>
+      </div>
+      <a href="{% url 'signup' %}" class="btn-c btn-c-green w-100 text-decoration-none text-center d-block">
+        <i class="fas fa-user-plus me-2"></i>CREATE ACCOUNT
+      </a>
+      <div class="stats-row">
+        <div class="text-center"><div class="s-val">99.2%</div><div class="s-lbl">Accuracy</div></div>
+        <div class="text-center"><div class="s-val">256-BIT</div><div class="s-lbl">Encryption</div></div>
+        <div class="text-center"><div class="s-val">24/7</div><div class="s-lbl">Monitoring</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

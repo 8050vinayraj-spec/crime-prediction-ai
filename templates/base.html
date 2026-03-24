@@ -6,57 +6,255 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Crime AI System{% endblock %}</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <style>
+    :root {
+      --cyan:    #00f5ff;
+      --green:   #39ff14;
+      --red:     #ff073a;
+      --orange:  #ff6600;
+      --yellow:  #ffe600;
+      --bg:      #020b14;
+      --card-bg: #050f1c;
+      --border:  rgba(0,245,255,0.15);
+      --muted:   #3a6070;
+      --text:    #cce8f0;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Animated grid */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(0,245,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,245,255,0.03) 1px, transparent 1px);
+      background-size: 44px 44px;
+    }
+
+    /* Ambient glow orbs */
+    body::after {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 700px 500px at 5% 15%,  rgba(0,245,255,0.055) 0%, transparent 70%),
+        radial-gradient(ellipse 500px 400px at 95% 85%, rgba(57,255,20,0.04)  0%, transparent 70%),
+        radial-gradient(ellipse 400px 300px at 50% 50%, rgba(255,7,58,0.025)  0%, transparent 70%);
+      animation: orbs 14s ease-in-out infinite alternate;
+    }
+    @keyframes orbs { to { opacity: .6; transform: scale(1.06); } }
+
+    /* Scanning line */
+    .scan { position: fixed; left:0; right:0; height:2px; z-index:1; pointer-events:none;
+      background: linear-gradient(90deg, transparent, rgba(0,245,255,.12), transparent);
+      animation: scan 9s linear infinite; }
+    @keyframes scan { from { top: -2px; } to { top: 100vh; } }
+
+    /* ── NAVBAR ── */
+    .navbar {
+      position: relative; z-index: 200;
+      background: rgba(2,11,20,.93) !important;
+      border-bottom: 1px solid rgba(0,245,255,.18);
+      backdrop-filter: blur(14px);
+      padding: .6rem 1.8rem;
+    }
+    .navbar-brand {
+      font-family: 'Share Tech Mono', monospace;
+      color: var(--cyan) !important;
+      font-size: 1.15rem; letter-spacing: 2.5px;
+      text-shadow: 0 0 10px var(--cyan);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .brand-shield {
+      width:34px; height:34px; border:2px solid var(--cyan); border-radius:6px;
+      display:flex; align-items:center; justify-content:center; font-size:.95rem;
+      box-shadow: 0 0 10px rgba(0,245,255,.4);
+    }
+    .brand-sub { font-size:.6rem; color:var(--green); letter-spacing:2px; animation:blink 2s infinite; }
+    @keyframes blink { 50% { opacity:.25; } }
+
+    .nav-btn {
+      font-family: 'Share Tech Mono', monospace;
+      font-size:.68rem; letter-spacing:1.2px; text-transform:uppercase;
+      padding:.28rem .85rem; border-radius:3px; text-decoration:none;
+      transition: all .2s; border:1px solid transparent;
+    }
+    .nb-cyan   { color:var(--cyan);   border-color:rgba(0,245,255,.4);  }
+    .nb-cyan:hover   { background:rgba(0,245,255,.12); border-color:var(--cyan);   color:var(--cyan);   box-shadow:0 0 10px rgba(0,245,255,.3); }
+    .nb-green  { color:var(--green);  border-color:rgba(57,255,20,.4);  }
+    .nb-green:hover  { background:rgba(57,255,20,.12); border-color:var(--green);  color:var(--green);  box-shadow:0 0 10px rgba(57,255,20,.3); }
+    .nb-orange { color:var(--orange); border-color:rgba(255,102,0,.4);  }
+    .nb-orange:hover { background:rgba(255,102,0,.12); border-color:var(--orange); color:var(--orange); box-shadow:0 0 10px rgba(255,102,0,.3); }
+    .nb-red    { color:var(--red);    border-color:rgba(255,7,58,.4);   }
+    .nb-red:hover    { background:rgba(255,7,58,.12);  border-color:var(--red);    color:var(--red);    box-shadow:0 0 10px rgba(255,7,58,.3); }
+    .nb-solid  { color:var(--cyan); background:rgba(0,245,255,.1); border-color:var(--cyan); }
+    .nb-solid:hover  { background:rgba(0,245,255,.22); box-shadow:0 0 14px rgba(0,245,255,.4); color:var(--cyan); }
+    .nb-user   { font-family:'Share Tech Mono',monospace; font-size:.65rem; color:var(--muted); letter-spacing:1px; padding:.3rem .5rem; }
+
+    /* ── LAYOUT ── */
+    .page-wrap { position:relative; z-index:10; max-width:1300px; margin:0 auto; padding:2rem 1.5rem 3rem; }
+
+    /* ── CARDS ── */
+    .c-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px; padding: 1.8rem;
+      backdrop-filter: blur(8px); position: relative; overflow: hidden;
+      transition: border-color .3s, box-shadow .3s;
+    }
+    .c-card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:2px;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+      opacity:.55;
+    }
+    .c-card:hover { border-color:rgba(0,245,255,.32); box-shadow:0 0 28px rgba(0,245,255,.07); }
+    .c-card-red::before  { background: linear-gradient(90deg, transparent, var(--red),    transparent); }
+    .c-card-green::before{ background: linear-gradient(90deg, transparent, var(--green),  transparent); }
+    .c-card-orange::before{background: linear-gradient(90deg, transparent, var(--orange), transparent); }
+    .c-card-red   { border-color:rgba(255,7,58,.18); }
+    .c-card-green { border-color:rgba(57,255,20,.18); }
+    .c-card-orange{ border-color:rgba(255,102,0,.18); }
+
+    /* ── PAGE HEADER ── */
+    .page-hdr { border-left:3px solid var(--cyan); padding-left:1rem; margin-bottom:2rem; }
+    .page-hdr h2 { font-family:'Share Tech Mono',monospace; font-size:1.55rem; color:var(--cyan); letter-spacing:2.5px; text-shadow:0 0 10px rgba(0,245,255,.4); }
+    .page-hdr p  { font-size:.82rem; color:var(--muted); letter-spacing:1.2px; margin-top:.25rem; font-family:'Share Tech Mono',monospace; }
+
+    /* ── FORMS ── */
+    .form-label { font-family:'Share Tech Mono',monospace; font-size:.73rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--cyan); margin-bottom:.35rem; display:block; }
+    .form-control, .form-select {
+      background: rgba(0,245,255,.04) !important;
+      border: 1px solid rgba(0,245,255,.2) !important;
+      color: var(--text) !important; border-radius:4px !important;
+      font-family:'Share Tech Mono',monospace; font-size:.88rem;
+      transition: border-color .2s, box-shadow .2s; padding:.55rem .85rem;
+    }
+    .form-control::placeholder { color:var(--muted) !important; }
+    .form-control:focus, .form-select:focus {
+      border-color:var(--cyan) !important;
+      box-shadow:0 0 12px rgba(0,245,255,.2) !important;
+      background:rgba(0,245,255,.07) !important; outline:none !important;
+    }
+    .form-check-input { background:rgba(0,245,255,.05); border:1px solid rgba(0,245,255,.3); }
+    .form-check-input:checked { background-color:var(--cyan); border-color:var(--cyan); }
+    .form-check-label { font-family:'Share Tech Mono',monospace; font-size:.82rem; color:var(--text); }
+
+    /* ── BUTTONS ── */
+    .btn-c {
+      font-family:'Share Tech Mono',monospace; letter-spacing:2px; text-transform:uppercase;
+      font-size:.82rem; padding:.6rem 1.8rem; border-radius:4px; cursor:pointer;
+      transition:all .2s; border:1px solid var(--cyan);
+      background:rgba(0,245,255,.1); color:var(--cyan);
+    }
+    .btn-c:hover { background:rgba(0,245,255,.22); box-shadow:0 0 18px rgba(0,245,255,.35); color:#fff; }
+    .btn-c-red    { border-color:var(--red);    background:rgba(255,7,58,.1);   color:var(--red);    }
+    .btn-c-red:hover    { background:rgba(255,7,58,.22);  box-shadow:0 0 18px rgba(255,7,58,.35);  color:#fff; }
+    .btn-c-green  { border-color:var(--green);  background:rgba(57,255,20,.1);  color:var(--green);  }
+    .btn-c-green:hover  { background:rgba(57,255,20,.22); box-shadow:0 0 18px rgba(57,255,20,.35); color:#fff; }
+    .btn-c-orange { border-color:var(--orange); background:rgba(255,102,0,.1);  color:var(--orange); }
+    .btn-c-orange:hover { background:rgba(255,102,0,.22); box-shadow:0 0 18px rgba(255,102,0,.35); color:#fff; }
+
+    /* ── ALERTS ── */
+    .a-danger  { background:rgba(255,7,58,.08);  border:1px solid rgba(255,7,58,.3);  border-left:3px solid var(--red);    color:#ff8099; border-radius:4px; padding:.7rem 1rem; font-family:'Share Tech Mono',monospace; font-size:.82rem; }
+    .a-success { background:rgba(57,255,20,.06); border:1px solid rgba(57,255,20,.2); border-left:3px solid var(--green);  color:#99ff77; border-radius:4px; padding:.7rem 1rem; font-family:'Share Tech Mono',monospace; font-size:.82rem; }
+    .a-info    { background:rgba(0,245,255,.06);  border:1px solid rgba(0,245,255,.2); border-left:3px solid var(--cyan);   color:#88ddee; border-radius:4px; padding:.7rem 1rem; font-family:'Share Tech Mono',monospace; font-size:.82rem; }
+    .a-warning { background:rgba(255,102,0,.07); border:1px solid rgba(255,102,0,.25); border-left:3px solid var(--orange); color:#ffaa66; border-radius:4px; padding:.7rem 1rem; font-family:'Share Tech Mono',monospace; font-size:.82rem; }
+
+    /* ── TABLE ── */
+    .c-table { width:100%; border-collapse:collapse; font-family:'Share Tech Mono',monospace; font-size:.82rem; }
+    .c-table th { background:rgba(0,245,255,.07); color:var(--cyan); padding:.7rem 1rem; text-transform:uppercase; letter-spacing:1.5px; font-size:.72rem; border-bottom:1px solid rgba(0,245,255,.18); }
+    .c-table td { padding:.65rem 1rem; border-bottom:1px solid rgba(0,245,255,.06); color:var(--text); }
+    .c-table tr:hover td { background:rgba(0,245,255,.03); }
+    .c-table-wrap { border:1px solid rgba(0,245,255,.12); border-radius:6px; overflow:hidden; }
+
+    /* ── BADGES ── */
+    .b-cyan    { background:rgba(0,245,255,.14); color:var(--cyan);   border:1px solid rgba(0,245,255,.3);  font-family:'Share Tech Mono',monospace; font-size:.68rem; padding:.25em .65em; border-radius:3px; letter-spacing:1px; }
+    .b-green   { background:rgba(57,255,20,.14); color:var(--green);  border:1px solid rgba(57,255,20,.3);  font-family:'Share Tech Mono',monospace; font-size:.68rem; padding:.25em .65em; border-radius:3px; letter-spacing:1px; }
+    .b-red     { background:rgba(255,7,58,.14);  color:var(--red);    border:1px solid rgba(255,7,58,.3);   font-family:'Share Tech Mono',monospace; font-size:.68rem; padding:.25em .65em; border-radius:3px; letter-spacing:1px; }
+    .b-orange  { background:rgba(255,102,0,.14); color:var(--orange); border:1px solid rgba(255,102,0,.3);  font-family:'Share Tech Mono',monospace; font-size:.68rem; padding:.25em .65em; border-radius:3px; letter-spacing:1px; }
+
+    /* ── STAT CARDS ── */
+    .stat-card { background:var(--card-bg); border:1px solid var(--border); border-radius:6px; padding:1.4rem 1.2rem; text-align:center; position:relative; overflow:hidden; }
+    .stat-val  { font-family:'Share Tech Mono',monospace; font-size:2rem; text-shadow:0 0 10px currentColor; }
+    .stat-lbl  { font-family:'Share Tech Mono',monospace; font-size:.65rem; color:var(--muted); letter-spacing:2px; text-transform:uppercase; margin-top:.3rem; }
+    .stat-icon { font-size:1.5rem; margin-bottom:.5rem; }
+
+    /* ── FOOTER ── */
+    .c-footer { position:relative; z-index:10; text-align:center; padding:1.2rem; border-top:1px solid rgba(0,245,255,.07); font-family:'Share Tech Mono',monospace; font-size:.66rem; color:var(--muted); letter-spacing:1.2px; }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width:5px; }
+    ::-webkit-scrollbar-track { background:var(--bg); }
+    ::-webkit-scrollbar-thumb { background:rgba(0,245,255,.28); border-radius:3px; }
+
+    /* ── UTILITY ── */
+    .mono { font-family:'Share Tech Mono',monospace; }
+    .text-cyan   { color:var(--cyan)   !important; }
+    .text-ngreen { color:var(--green)  !important; }
+    .text-nred   { color:var(--red)    !important; }
+    .text-noran  { color:var(--orange) !important; }
+    .section-divider { border:0; border-top:1px solid rgba(0,245,255,.08); margin:2rem 0; }
+  </style>
+  {% block extra_css %}{% endblock %}
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4">
-  <a class="navbar-brand fw-bold" href="/">🔍 Crime AI</a>
-  <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-          data-bs-target="#navMenu">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navMenu">
-  <div class="ms-auto d-flex gap-2 align-items-center">
-    {% if user.is_authenticated %}
-    <a class="btn btn-outline-light btn-sm" href="{% url 'crime_home' %}">Crime</a>
-    <a class="btn btn-outline-warning btn-sm" href="{% url 'phishing_home' %}">Cyber</a>
-    <!-- Cybersecurity Tools Dropdown -->
-    <div class="dropdown">
-      <button class="btn btn-outline-info btn-sm dropdown-toggle"
-              data-bs-toggle="dropdown">🔐 Tools</button>
-      <ul class="dropdown-menu dropdown-menu-end">
-        <li><a class="dropdown-item" href="{% url 'ssl_checker' %}">🔒 SSL Checker</a></li>
-        <li><a class="dropdown-item" href="{% url 'password_checker' %}">🔑 Password Checker</a></li>
-        <li><a class="dropdown-item" href="{% url 'ip_checker' %}">🌐 IP Reputation</a></li>
-        <li><a class="dropdown-item" href="{% url 'file_scanner' %}">📁 File Scanner</a></li>
-        <li><a class="dropdown-item" href="{% url 'email_analyser' %}">📧 Email Analyser</a></li>
-        <li><a class="dropdown-item" href="{% url 'port_scanner' %}">🔌 Port Scanner</a></li>
-        <li><a class="dropdown-item" href="{% url 'whois_lookup' %}">🔎 WHOIS Lookup</a></li>
-        <li><hr class="dropdown-divider"></li>
-        <li><a class="dropdown-item" href="{% url 'threat_intel' %}">🛡️ Threat Intel</a></li>
-        <li><a class="dropdown-item" href="{% url 'breach_checker' %}">🕵️ Breach Monitor</a></li>
-        <li><a class="dropdown-item" href="{% url 'crime_heatmap' %}">🗺️ Crime Heatmap</a></li>
-      </ul>
+  <div class="scan"></div>
+
+  <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid px-0">
+      <a class="navbar-brand" href="/">
+        <div class="brand-shield"><i class="fas fa-shield-alt"></i></div>
+        <div>
+          <div>CRIME-AI</div>
+          <div class="brand-sub">● SYSTEM ONLINE</div>
+        </div>
+      </a>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav" style="color:var(--cyan)">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="collapse navbar-collapse" id="nav">
+        <div class="ms-auto d-flex gap-2 align-items-center flex-wrap py-1">
+          {% if user.is_authenticated %}
+            <a class="nav-btn nb-cyan"   href="{% url 'crime_home' %}"><i class="fas fa-search me-1"></i>Crime</a>
+            <a class="nav-btn nb-orange" href="{% url 'phishing_home' %}"><i class="fas fa-bug me-1"></i>Cyber</a>
+            <a class="nav-btn nb-cyan"   href="{% url 'charts_crime' %}"><i class="fas fa-chart-bar me-1"></i>Charts</a>
+            {% if user.role == "OFFICER" %}
+              <a class="nav-btn nb-solid" href="{% url 'officer_dashboard' %}"><i class="fas fa-tachometer-alt me-1"></i>Dashboard</a>
+            {% elif user.role == "ANALYST" %}
+              <a class="nav-btn nb-solid" href="{% url 'analyst_dashboard' %}"><i class="fas fa-tachometer-alt me-1"></i>Dashboard</a>
+            {% else %}
+              <a class="nav-btn nb-solid" href="{% url 'user_dashboard' %}"><i class="fas fa-tachometer-alt me-1"></i>Dashboard</a>
+            {% endif %}
+            <span class="nb-user"><i class="fas fa-user-circle me-1"></i>{{ user.username }}</span>
+            <a class="nav-btn nb-red" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-1"></i>Logout</a>
+          {% else %}
+            <a class="nav-btn nb-cyan"  href="{% url 'login' %}"><i class="fas fa-sign-in-alt me-1"></i>Login</a>
+            <a class="nav-btn nb-solid" href="{% url 'signup' %}"><i class="fas fa-user-plus me-1"></i>Sign Up</a>
+          {% endif %}
+        </div>
+      </div>
     </div>
-    <a class="btn btn-outline-info btn-sm" href="{% url 'charts_crime' %}">Charts</a>
-    {% if user.role == "OFFICER" %}
-      <a class="btn btn-outline-success btn-sm" href="{% url 'officer_dashboard' %}">Dashboard</a>
-    {% elif user.role == "ANALYST" %}
-      <a class="btn btn-outline-success btn-sm" href="{% url 'analyst_dashboard' %}">Dashboard</a>
-    {% else %}
-      <a class="btn btn-outline-success btn-sm" href="{% url 'user_dashboard' %}">Dashboard</a>
-    {% endif %}
-    <a class="btn btn-outline-danger btn-sm" href="{% url 'logout' %}">Logout</a>
-    {% else %}
-    <a class="btn btn-outline-light btn-sm" href="{% url 'login' %}">Login</a>
-    <a class="btn btn-primary btn-sm" href="{% url 'signup' %}">Sign Up</a>
-    {% endif %}
-  </div></div>
-</nav>
-<div class="container mt-4 mb-5">
-  {% block content %}{% endblock %}
-</div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body></html>
- 
+  </nav>
+
+  <div class="page-wrap">
+    {% block content %}{% endblock %}
+  </div>
+
+  <footer class="c-footer">
+    <i class="fas fa-lock me-2"></i>CRIME PREDICTION & CYBERCRIME DETECTION SYSTEM &nbsp;|&nbsp; SECURE CONNECTION &nbsp;|&nbsp; <span style="color:var(--green)">● ENCRYPTED</span>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

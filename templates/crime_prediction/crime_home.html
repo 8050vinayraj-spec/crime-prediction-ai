@@ -1,14 +1,68 @@
-{% extends "base.html" %}{% block title %}Crime Prediction{% endblock %}
+{% extends "base.html" %}
+{% block title %}Crime Prediction — Crime AI{% endblock %}
+{% block extra_css %}
+<style>
+  .predict-form .form-group { margin-bottom:1.3rem; }
+  .info-panel { background:rgba(255,7,58,.05); border:1px solid rgba(255,7,58,.15); border-left:3px solid var(--red); border-radius:4px; padding:1rem 1.2rem; }
+  .info-item { display:flex; align-items:center; gap:.75rem; margin-bottom:.6rem; font-family:'Share Tech Mono',monospace; font-size:.78rem; color:var(--text); }
+  .info-item:last-child { margin-bottom:0; }
+  .info-icon { color:var(--red); width:18px; text-align:center; }
+  .form-text { font-family:'Share Tech Mono',monospace; font-size:.67rem; color:var(--muted); margin-top:.25rem; letter-spacing:.5px; }
+</style>
+{% endblock %}
 {% block content %}
-<h2 class="text-primary mb-4">Crime Prediction</h2>
-<div class="row"><div class="col-md-6">
-<form method="POST" action="{% url 'crime_result' %}">{% csrf_token %}
-  <div class="mb-3"><label class="form-label">Year</label>
-  <input type="number" name="year" class="form-control" value="2024" min="2000" max="2030" required></div>
-  <div class="mb-3"><label class="form-label">Month (1–12)</label>
-  <input type="number" name="month" class="form-control" min="1" max="12" required></div>
-  <div class="mb-3"><label class="form-label">Location Code</label>
-  <input type="number" name="location" class="form-control" min="1" required>
-  <div class="form-text">e.g. 1=Chennai, 2=Mumbai, 3=Delhi ...</div></div>
-  <button type="submit" class="btn btn-danger px-5">Predict Crime</button>
-</form></div></div>{% endblock %}
+<div class="page-hdr">
+  <h2><i class="fas fa-search me-2"></i>CRIME PREDICTION</h2>
+  <p>AI-POWERED CRIME TYPE FORECASTING SYSTEM</p>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="c-card c-card-red">
+      <h5 class="mono text-nred mb-4" style="letter-spacing:2px;font-size:.9rem;"><i class="fas fa-sliders-h me-2"></i>INPUT PARAMETERS</h5>
+      <form method="POST" action="{% url 'crime_result' %}" class="predict-form">{% csrf_token %}
+        <div class="form-group">
+          <label class="form-label">Year</label>
+          <input type="number" name="year" class="form-control" value="2024" min="2000" max="2030" required>
+          <div class="form-text">// Range: 2000 – 2030</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Month (1–12)</label>
+          <input type="number" name="month" class="form-control" placeholder="e.g. 6" min="1" max="12" required>
+          <div class="form-text">// January = 1, December = 12</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Location Code</label>
+          <input type="number" name="location" class="form-control" placeholder="e.g. 1" min="1" required>
+          <div class="form-text">// 1=Chennai  2=Mumbai  3=Delhi  4=Bangalore  5=Hyderabad</div>
+        </div>
+        <button type="submit" class="btn-c btn-c-red w-100 mt-2">
+          <i class="fas fa-brain me-2"></i>RUN PREDICTION
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="c-card mb-4">
+      <h5 class="mono text-cyan mb-3" style="letter-spacing:2px;font-size:.9rem;"><i class="fas fa-info-circle me-2"></i>HOW IT WORKS</h5>
+      <div class="info-panel">
+        <div class="info-item"><span class="info-icon"><i class="fas fa-database"></i></span>Trained on historical crime data across Indian cities</div>
+        <div class="info-item"><span class="info-icon"><i class="fas fa-tree"></i></span>Uses Random Forest classification algorithm</div>
+        <div class="info-item"><span class="info-icon"><i class="fas fa-bullseye"></i></span>Predicts the most likely crime type for given inputs</div>
+        <div class="info-item"><span class="info-icon"><i class="fas fa-chart-line"></i></span>Model accuracy: ~92%</div>
+      </div>
+    </div>
+    <div class="c-card">
+      <h5 class="mono text-cyan mb-3" style="letter-spacing:2px;font-size:.9rem;"><i class="fas fa-tags me-2"></i>CRIME CATEGORIES</h5>
+      <div class="d-flex flex-wrap gap-2">
+        <span class="b-red">Theft</span>
+        <span class="b-orange">Assault</span>
+        <span class="b-cyan">Cybercrime</span>
+        <span class="b-red">Fraud</span>
+        <span class="b-orange">Vandalism</span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

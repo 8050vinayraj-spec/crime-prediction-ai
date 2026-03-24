@@ -1,15 +1,49 @@
-{% extends "base.html" %}{% block title %}Crime Charts{% endblock %}
+{% extends "base.html" %}
+{% block title %}Crime Charts — Crime AI{% endblock %}
 {% block content %}
-<h2 class="text-primary mb-4">Crime Type Distribution</h2>
-<div class="row"><div class="col-md-8">
-  <canvas id="crimeChart"></canvas>
-</div></div>
+<div class="page-hdr">
+  <h2><i class="fas fa-chart-bar me-2"></i>CRIME DISTRIBUTION</h2>
+  <p>VISUALIZING PREDICTION DATA</p>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="c-card">
+      <h5 class="mono text-cyan mb-3" style="letter-spacing:2px;font-size:.88rem;"><i class="fas fa-chart-bar me-2"></i>CRIME TYPE FREQUENCY</h5>
+      <canvas id="crimeChart" height="300"></canvas>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="c-card c-card-red">
+      <h5 class="mono text-nred mb-3" style="letter-spacing:2px;font-size:.88rem;"><i class="fas fa-chart-pie me-2"></i>DISTRIBUTION</h5>
+      <canvas id="crimePie" height="280"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="mt-3">
+  <a href="{% url 'crime_home' %}" class="btn-c btn-c-red text-decoration-none me-2"><i class="fas fa-search me-2"></i>NEW PREDICTION</a>
+  <a href="{% url 'charts_cyber' %}" class="btn-c btn-c-orange text-decoration-none"><i class="fas fa-bug me-2"></i>CYBER CHARTS</a>
+</div>
+{% endblock %}
+{% block extra_js %}
 <script>
-  new Chart(document.getElementById('crimeChart'), {
-    type: 'bar',
-    data: { labels: {{ labels|safe }},
-      datasets: [{ label: 'Crime Count', data: {{ counts|safe }},
-        backgroundColor: ['#ef5350','#42a5f5','#66bb6a','#ffa726','#ab47bc'] }] },
-    options: { responsive: true }
-  });
-</script>{% endblock %}
+const labels = {{ labels|safe }};
+const counts = {{ counts|safe }};
+const neonColors = ['#ff073a','#00f5ff','#39ff14','#ff6600','#ffe600','#bf5fff'];
+Chart.defaults.color = '#3a6070';
+Chart.defaults.borderColor = 'rgba(0,245,255,0.08)';
+
+new Chart(document.getElementById('crimeChart'), {
+  type: 'bar',
+  data: { labels, datasets: [{ label: 'Crime Count', data: counts, backgroundColor: neonColors, borderColor: neonColors, borderWidth: 1, borderRadius: 3 }] },
+  options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { grid: { color: 'rgba(0,245,255,0.05)' } }, y: { grid: { color: 'rgba(0,245,255,0.05)' }, ticks: { color: '#3a6070' } } } }
+});
+
+new Chart(document.getElementById('crimePie'), {
+  type: 'doughnut',
+  data: { labels, datasets: [{ data: counts, backgroundColor: neonColors, borderColor: '#050f1c', borderWidth: 2 }] },
+  options: { responsive: true, plugins: { legend: { labels: { color: '#cce8f0', font: { family: 'Share Tech Mono' } } } } }
+});
+</script>
+{% endblock %}

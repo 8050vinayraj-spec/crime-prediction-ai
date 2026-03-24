@@ -1,15 +1,60 @@
-{% extends "base.html" %}{% block title %}Sign Up{% endblock %}
+{% extends "base.html" %}
+{% block title %}Register — Crime AI{% endblock %}
+{% block extra_css %}
+<style>
+  .signup-wrap { min-height:calc(100vh - 130px); display:flex; align-items:center; justify-content:center; padding:2rem 0; }
+  .signup-box  { width:100%; max-width:460px; position:relative; }
+  .corner { position:absolute; width:16px; height:16px; }
+  .c-tl { top:-1px; left:-1px; border-top:2px solid var(--green); border-left:2px solid var(--green); }
+  .c-tr { top:-1px; right:-1px; border-top:2px solid var(--green); border-right:2px solid var(--green); }
+  .c-bl { bottom:-1px; left:-1px; border-bottom:2px solid var(--green); border-left:2px solid var(--green); }
+  .c-br { bottom:-1px; right:-1px; border-bottom:2px solid var(--green); border-right:2px solid var(--green); }
+  .signup-icon { width:72px; height:72px; border:2px solid var(--green); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.9rem; color:var(--green); margin:0 auto 1.2rem; box-shadow:0 0 24px rgba(57,255,20,.35); animation:pulse-g 3s ease-in-out infinite; }
+  @keyframes pulse-g { 50% { box-shadow:0 0 42px rgba(57,255,20,.65); } }
+  .signup-title { font-family:'Share Tech Mono',monospace; font-size:1.35rem; color:var(--green); letter-spacing:3px; text-shadow:0 0 10px rgba(57,255,20,.4); }
+  .signup-sub   { font-family:'Share Tech Mono',monospace; font-size:.65rem; color:var(--muted); letter-spacing:2px; margin-top:.3rem; }
+  .iw { position:relative; margin-bottom:1.2rem; }
+  .iw-icon { position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--muted); font-size:.82rem; z-index:5; transition:color .2s; }
+  .iw:focus-within .iw-icon { color:var(--green); }
+  .iw .form-control { padding-left:38px !important; }
+  .iw:focus-within .form-control { border-color:var(--green) !important; box-shadow:0 0 12px rgba(57,255,20,.2) !important; }
+  .notice-box { background:rgba(57,255,20,.05); border:1px solid rgba(57,255,20,.15); border-left:3px solid var(--green); border-radius:4px; padding:.7rem 1rem; font-family:'Share Tech Mono',monospace; font-size:.73rem; color:rgba(57,255,20,.8); letter-spacing:.5px; margin-bottom:1.4rem; }
+  .term-line { font-family:'Share Tech Mono',monospace; font-size:.63rem; color:var(--green); letter-spacing:1px; margin-bottom:.5rem; overflow:hidden; white-space:nowrap; border-right:2px solid var(--green); animation:type 4s steps(34) infinite, blink-cur .7s step-end infinite; }
+  @keyframes type { 0%,100%{width:0} 30%,70%{width:100%} }
+  @keyframes blink-cur { 50%{border-color:transparent} }
+</style>
+{% endblock %}
 {% block content %}
-<div class="row justify-content-center"><div class="col-md-5">
-<h2 class="mb-4 text-primary">Create Account</h2>
-<form method="POST">{% csrf_token %}
-  <div class="mb-3"><label class="form-label">Username</label>
-  <input type="text" name="username" class="form-control" required></div>
-  <div class="mb-3"><label class="form-label">Email</label>
-  <input type="email" name="email" class="form-control" required></div>
-  <div class="mb-3"><label class="form-label">Password</label>
-  <input type="password" name="password" class="form-control" required></div>
-  <button type="submit" class="btn btn-primary w-100">Register</button>
-</form>
-<p class="mt-3 text-center">Already registered? <a href="{% url 'login' %}">Login</a></p>
-</div></div>{% endblock %}
+<div class="signup-wrap">
+  <div class="signup-box">
+    <div class="term-line">$ CREATING NEW SECURE PROFILE...</div>
+    <div class="c-card c-card-green">
+      <div class="corner c-tl"></div><div class="corner c-tr"></div>
+      <div class="corner c-bl"></div><div class="corner c-br"></div>
+      <div class="text-center mb-4">
+        <div class="signup-icon"><i class="fas fa-user-shield"></i></div>
+        <div class="signup-title">NEW OPERATIVE</div>
+        <div class="signup-sub">REGISTER TO CRIME AI DETECTION SYSTEM</div>
+      </div>
+      <div class="notice-box"><i class="fas fa-info-circle me-2"></i>Account requires officer approval before access is granted.</div>
+      {% if error %}<div class="a-danger mb-3"><i class="fas fa-exclamation-triangle me-2"></i>{{ error }}</div>{% endif %}
+      <form method="POST">{% csrf_token %}
+        <div class="iw">
+          <i class="fas fa-user iw-icon"></i>
+          <input type="text" name="username" class="form-control" placeholder="Choose a username" required autocomplete="off">
+        </div>
+        <div class="iw">
+          <i class="fas fa-envelope iw-icon"></i>
+          <input type="email" name="email" class="form-control" placeholder="Your email address" required>
+        </div>
+        <div class="iw">
+          <i class="fas fa-lock iw-icon"></i>
+          <input type="password" name="password" class="form-control" placeholder="Create a strong password" required>
+        </div>
+        <button type="submit" class="btn-c btn-c-green w-100 mt-1"><i class="fas fa-user-plus me-2"></i>CREATE ACCOUNT</button>
+      </form>
+      <p class="text-center mono mt-3" style="font-size:.78rem;color:var(--muted);">Already registered? <a href="{% url 'login' %}" style="color:var(--cyan);text-decoration:none;">LOGIN HERE</a></p>
+    </div>
+  </div>
+</div>
+{% endblock %}

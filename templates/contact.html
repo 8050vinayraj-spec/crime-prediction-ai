@@ -1,8 +1,63 @@
-{% extends "base.html" %}{% block content %}
-<h2 class="text-primary">Contact Us</h2>
-<form method="POST" class="col-md-6">{% csrf_token %}
-  <div class="mb-3"><label>Name</label><input type="text" class="form-control" required></div>
-  <div class="mb-3"><label>Email</label><input type="email" class="form-control" required></div>
-  <div class="mb-3"><label>Message</label><textarea class="form-control" rows="5"></textarea></div>
-  <button type="submit" class="btn btn-primary">Send</button>
-</form>{% endblock %}
+{% extends "base.html" %}
+{% block title %}Contact — Crime AI{% endblock %}
+{% block extra_css %}
+<style>
+  .form-group  { margin-bottom:1.3rem; }
+  .form-text   { font-family:'Share Tech Mono',monospace; font-size:.67rem; color:var(--muted); margin-top:.25rem; }
+  .iw { position:relative; }
+  .iw-icon { position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--muted); font-size:.82rem; z-index:5; transition:color .2s; }
+  .iw:focus-within .iw-icon { color:var(--cyan); }
+  .iw .form-control { padding-left:38px !important; }
+  .ta-wrap .iw-icon { top:18px; transform:none; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="page-hdr">
+  <h2><i class="fas fa-envelope me-2"></i>CONTACT US</h2>
+  <p>SEND A MESSAGE TO THE SYSTEM TEAM</p>
+</div>
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="c-card">
+      <h5 class="mono text-cyan mb-4" style="letter-spacing:2px;font-size:.88rem;"><i class="fas fa-paper-plane me-2"></i>SEND MESSAGE</h5>
+      <form method="POST">{% csrf_token %}
+        <div class="form-group">
+          <label class="form-label">Name</label>
+          <div class="iw">
+            <i class="fas fa-user iw-icon"></i>
+            <input type="text" name="name" class="form-control" placeholder="Your full name" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <div class="iw">
+            <i class="fas fa-envelope iw-icon"></i>
+            <input type="email" name="email" class="form-control" placeholder="your@email.com" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Message</label>
+          <div class="iw ta-wrap">
+            <i class="fas fa-comment iw-icon"></i>
+            <textarea name="message" class="form-control" rows="5" placeholder="Type your message here..." style="padding-left:38px !important;"></textarea>
+          </div>
+        </div>
+        <button type="submit" class="btn-c w-100">
+          <i class="fas fa-paper-plane me-2"></i>SEND MESSAGE
+        </button>
+      </form>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="c-card c-card-green">
+      <h5 class="mono text-ngreen mb-3" style="letter-spacing:2px;font-size:.88rem;"><i class="fas fa-info-circle me-2"></i>CONTACT INFO</h5>
+      <div class="mono" style="font-size:.8rem;color:var(--muted);line-height:2.2;">
+        <div><i class="fas fa-map-marker-alt me-2" style="color:var(--cyan)"></i>Crime AI Detection Lab</div>
+        <div><i class="fas fa-envelope me-2" style="color:var(--cyan)"></i>support@crimeai.system</div>
+        <div><i class="fas fa-clock me-2" style="color:var(--cyan)"></i>Available 24/7</div>
+        <div><i class="fas fa-shield-alt me-2" style="color:var(--green)"></i>Secure Encrypted Channel</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
