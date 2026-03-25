@@ -14,6 +14,8 @@ from email.parser import HeaderParser
 import folium
 from django.http import HttpResponse
 import whois
+import requests
+from crime_prediction.models import CrimeData, CrimeModel
 
 MODEL_PATH   = os.path.join(os.path.dirname(__file__), 'ml', 'cyber_model.pkl')
 ENCODER_PATH = os.path.join(os.path.dirname(__file__), 'ml', 'cyber_encoder.pkl')

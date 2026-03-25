@@ -7,25 +7,37 @@
 </div>
 
 <div class="c-card mb-4">
-  <h5 class="mono text-noran mb-3" style="letter-spacing:2px; font-size:.9rem;"><i class="fas fa-hourglass-half me-2"></i>PENDING APPROVALS</h5>
+  <h5 class="mono text-noran mb-3" style="letter-spacing:2px; font-size:.9rem;">
+    <i class="fas fa-hourglass-half me-2"></i>PENDING APPROVALS
+  </h5>
   <div class="c-table-wrap">
     <table class="c-table">
-      <thead><tr><th>Username</th><th>Email</th><th>Action</th></tr></thead>
+      <thead>
+        <tr><th>Username</th><th>Email</th><th>Action</th></tr>
+      </thead>
       <tbody>
         {% for a in pending %}
         <tr>
-          <td><i class="fas fa-user me-2" style="color:var(--muted)"></i>{{ a.user.username }}</td>
-          <td>{{ a.user.email }}</td>
+          <td><i class="fas fa-user me-2" style="color:var(--muted)"></i>{{ a.username }}</td>
+          <td>{{ a.email }}</td>
           <td>
             <form method="POST" class="d-flex gap-2">{% csrf_token %}
-              <input type="hidden" name="user_id" value="{{ a.user.id }}">
-              <button name="action" value="approve" class="btn-c btn-c-green" style="padding:.3rem .9rem;font-size:.72rem;"><i class="fas fa-check me-1"></i>APPROVE</button>
-              <button name="action" value="reject"  class="btn-c btn-c-red"   style="padding:.3rem .9rem;font-size:.72rem;"><i class="fas fa-times me-1"></i>REJECT</button>
+              <input type="hidden" name="user_id" value="{{ a.id }}">
+              <button name="action" value="approve" class="btn-c btn-c-green" style="padding:.3rem .9rem;font-size:.72rem;">
+                <i class="fas fa-check me-1"></i>APPROVE
+              </button>
+              <button name="action" value="reject" class="btn-c btn-c-red" style="padding:.3rem .9rem;font-size:.72rem;">
+                <i class="fas fa-times me-1"></i>REJECT
+              </button>
             </form>
           </td>
         </tr>
         {% empty %}
-        <tr><td colspan="3" class="text-center" style="color:var(--muted);padding:1.5rem;"><i class="fas fa-check-circle me-2" style="color:var(--green)"></i>No pending approvals</td></tr>
+        <tr>
+          <td colspan="3" class="text-center" style="color:var(--muted);padding:1.5rem;">
+            <i class="fas fa-check-circle me-2" style="color:var(--green)"></i>No pending approvals
+          </td>
+        </tr>
         {% endfor %}
       </tbody>
     </table>
@@ -34,15 +46,19 @@
 
 {% if approved %}
 <div class="c-card c-card-green">
-  <h5 class="mono text-ngreen mb-3" style="letter-spacing:2px; font-size:.9rem;"><i class="fas fa-check-circle me-2"></i>APPROVED ACCOUNTS</h5>
+  <h5 class="mono text-ngreen mb-3" style="letter-spacing:2px; font-size:.9rem;">
+    <i class="fas fa-check-circle me-2"></i>APPROVED ACCOUNTS
+  </h5>
   <div class="c-table-wrap">
     <table class="c-table">
-      <thead><tr><th>Username</th><th>Email</th><th>Status</th></tr></thead>
+      <thead>
+        <tr><th>Username</th><th>Email</th><th>Status</th></tr>
+      </thead>
       <tbody>
         {% for a in approved %}
         <tr>
-          <td><i class="fas fa-user me-2" style="color:var(--muted)"></i>{{ a.user.username }}</td>
-          <td>{{ a.user.email }}</td>
+          <td><i class="fas fa-user me-2" style="color:var(--muted)"></i>{{ a.username }}</td>
+          <td>{{ a.email }}</td>
           <td><span class="b-green">APPROVED</span></td>
         </tr>
         {% endfor %}

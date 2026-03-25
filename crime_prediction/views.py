@@ -1,12 +1,15 @@
 import joblib, os, json
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from .models import CrimeData, CrimeModel
-import folium
 from django.http import HttpResponse
+from django.db.models import Count
 
+from .models import CrimeData, CrimeModel
 from visualization.models import PredictionLog
 
+import folium
+
+# Paths to ML models
 MODEL_PATH   = os.path.join(os.path.dirname(__file__), 'ml', 'crime_model.pkl')
 ENCODER_PATH = os.path.join(os.path.dirname(__file__), 'ml', 'label_encoder.pkl')
 
@@ -24,28 +27,44 @@ def crime_result_view(request):
         year     = int(request.POST['year'])
         month    = int(request.POST['month'])
         location = int(request.POST['location'])
+
+        # Load ML model and encoder
         model    = joblib.load(MODEL_PATH)
         le       = joblib.load(ENCODER_PATH)
+
         encoded  = model.predict([[year, month, location]])[0]
         result   = le.inverse_transform([encoded])[0]
-        CrimeData.objects.create(year=year, month=month,
-                                 location=str(location), crime_type=result)
-        PredictionLog.objects.create(user=request.user, module='crime',
+
+        # Save prediction to DB
+        CrimeData.objects.create(
+            year=year, month=month,
+            location=str(location), crime_type=result
+        )
+        PredictionLog.objects.create(
+            user=request.user, module='crime',
             input_data={'year': year, 'month': month, 'location': location},
-            result=result)
-        return render(request, 'crime_prediction/crime_result.html',
-            {'result': result, 'year': year, 'month': month, 'location': location})
+            result=result
+        )
+
+        return render(request, 'crime_prediction/crime_result.html', {
+            'result': result,
+            'year': year,
+            'month': month,
+            'location': location
+        })
     return redirect('crime_home')
 
 @login_required
 def crime_visualization_view(request):
-    from django.db.models import Count
     data   = CrimeData.objects.values('crime_type').annotate(count=Count('id'))
     labels = [d['crime_type'] for d in data]
     counts = [d['count'] for d in data]
-    return render(request, 'crime_prediction/crime_visualization.html',
-                  {'labels': json.dumps(labels), 'counts': json.dumps(counts)})
+    return render(request, 'crime_prediction/crime_visualization.html', {
+        'labels': json.dumps(labels),
+        'counts': json.dumps(counts)
+    })
 
+# Coordinates for locations
 LOCATION_COORDS = {
     '1':  (13.0827, 80.2707),   # Chennai
     '2':  (19.0760, 72.8777),   # Mumbai
@@ -57,6 +76,7 @@ LOCATION_COORDS = {
     '8':  (18.5204, 73.8567),   # Pune
 }
 
+# Colors for crime types
 CRIME_COLORS = {
     'Theft':     'red',
     'Assault':   'orange',
@@ -80,44 +100,6 @@ def crime_heatmap_view(request):
                 icon=folium.Icon(color=color, icon='exclamation-sign')
             ).add_to(m)
     map_html = m._repr_html_()
-    return render(request, 'crime_prediction/crime_heatmap.html',
-                  {'map_html': map_html})
-import folium
-from django.http import HttpResponse
-
-LOCATION_COORDS = {
-    '1':  (13.0827, 80.2707),   # Chennai
-    '2':  (19.0760, 72.8777),   # Mumbai
-    '3':  (28.7041, 77.1025),   # Delhi
-    '4':  (12.9716, 77.5946),   # Bangalore
-    '5':  (17.3850, 78.4867),   # Hyderabad
-    '6':  (22.5726, 88.3639),   # Kolkata
-    '7':  (23.0225, 72.5714),   # Ahmedabad
-    '8':  (18.5204, 73.8567),   # Pune
-}
-
-CRIME_COLORS = {
-    'Theft':     'red',
-    'Assault':   'orange',
-    'Cybercrime':'blue',
-    'Fraud':     'purple',
-    'Vandalism': 'gray'
-}
-
-@login_required
-def crime_heatmap_view(request):
-    m = folium.Map(location=[20.5937, 78.9629], zoom_start=5)
-    crimes = CrimeData.objects.all()
-    for crime in crimes:
-        coords = LOCATION_COORDS.get(str(crime.location))
-        if coords:
-            color = CRIME_COLORS.get(crime.crime_type, 'red')
-            folium.Marker(
-                location=coords,
-                popup=f'{crime.crime_type} — {crime.year}/{crime.month}',
-                tooltip=crime.crime_type,
-                icon=folium.Icon(color=color, icon='exclamation-sign')
-            ).add_to(m)
-    map_html = m._repr_html_()
-    return render(request, 'crime_prediction/crime_heatmap.html',
-                  {'map_html': map_html})
+    return render(request, 'crime_prediction/crime_heatmap.html', {
+        'map_html': map_html
+    })

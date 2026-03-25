@@ -12,17 +12,30 @@ def user_dashboard_view(request):
 
 @login_required
 def officer_dashboard_view(request):
-    if request.user.role != 'OFFICER': return redirect('user_dashboard')
-    total_users  = CustomUser.objects.count()
-    total_preds  = PredictionLog.objects.count()
-    pending_count = AccountApproval.objects.filter(status='PENDING').count()
-    recent_preds = PredictionLog.objects.order_by('-timestamp')[:10]
-    SystemStats.objects.update_or_create(id=1, defaults={
-        'total_users': total_users, 'total_predictions': total_preds})
+    if request.user.role != 'OFFICER':
+        return redirect('user_dashboard')
+    
+    total_users   = CustomUser.objects.count()
+    total_preds   = PredictionLog.objects.count()
+    pending_qs    = AccountApproval.objects.filter(status='PENDING')   # queryset
+    pending_count = pending_qs.count()                                 # integer
+    recent_preds  = PredictionLog.objects.order_by('-timestamp')[:10]
+    
+    SystemStats.objects.update_or_create(
+        id=1,
+        defaults={
+            'total_users': total_users,
+            'total_predictions': total_preds
+        }
+    )
+    
     return render(request, 'dashboard/officer_dashboard.html', {
-        'total_users': total_users, 'total_preds': total_preds,
-        'pending': pending_count, 'recent_preds': recent_preds})
-
+        'total_users':  total_users,
+        'total_preds':  total_preds,
+        'pending':      pending_qs,       # iterable for {% for a in pending %}
+        'pending_count': pending_count,   # integer for stat cards
+        'recent_preds': recent_preds,
+    })
 @login_required
 def analyst_dashboard_view(request):
     if request.user.role != 'ANALYST': return redirect('user_dashboard')
