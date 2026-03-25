@@ -9,6 +9,10 @@
   .ti-high   { background:rgba(255,7,58,.07); border:1px solid rgba(255,7,58,.2); color:#ff8099; }
   .ti-med    { background:rgba(255,102,0,.07); border:1px solid rgba(255,102,0,.2); color:#ffaa66; }
   .ti-low    { background:rgba(57,255,20,.07); border:1px solid rgba(57,255,20,.2); color:#99ff77; }
+  .url-analysis { background:rgba(0,255,200,.05); border:1px solid rgba(0,255,200,.15); border-radius:4px; padding:1rem; margin-bottom:1.3rem; display:none; }
+  .url-analysis.show { display:block; }
+  .analysis-item { display:flex; align-items:center; gap:.6rem; margin-bottom:.5rem; font-family:'Share Tech Mono',monospace; font-size:.76rem; }
+  .analysis-item:last-child { margin-bottom:0; }
 </style>
 {% endblock %}
 {% block content %}
@@ -21,24 +25,29 @@
   <div class="col-lg-7">
     <div class="c-card c-card-orange">
       <h5 class="mono text-noran mb-4" style="letter-spacing:2px;font-size:.9rem;"><i class="fas fa-search me-2"></i>URL ANALYSIS PARAMETERS</h5>
-      <form method="POST" action="{% url 'phishing_result' %}">{% csrf_token %}
+      <form method="POST" action="{% url 'phishing_result' %}" id="phishingForm">{% csrf_token %}
         <div class="form-group">
-          <label class="form-label">URL Length (characters)</label>
-          <input type="number" name="url_length" class="form-control" placeholder="e.g. 85" min="1" required>
-          <div class="form-text">// Phishing URLs are typically longer than legitimate ones</div>
+          <label class="form-label">Enter URL to Analyze</label>
+          <input type="url" name="url" id="urlInput" class="form-control" placeholder="e.g. https://example-bank-secure.com/login" required>
+          <div class="form-text">// Paste the URL you want to analyze for phishing threats</div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Suspicious Keyword Count</label>
-          <input type="number" name="suspicious_keywords" class="form-control" placeholder="e.g. 3" min="0" required>
-          <div class="form-text">// Count of words like: login, secure, verify, update, bank</div>
+
+        <!-- Auto-detected Analysis Display -->
+        <div class="url-analysis" id="urlAnalysis">
+          <h6 style="color:var(--cyan);margin-bottom:.8rem;font-size:.85rem;"><i class="fas fa-microscope me-2"></i>AUTO-DETECTED ANALYSIS</h6>
+          <div class="analysis-item"><span style="color:var(--cyan);min-width:140px;">URL Length:</span> <span id="analysisLength">-</span></div>
+          <div class="analysis-item"><span style="color:var(--cyan);min-width:140px;">Has IP Address:</span> <span id="analysisIP">-</span></div>
+          <div class="analysis-item"><span style="color:var(--cyan);min-width:140px;">Uses HTTPS:</span> <span id="analysisHTTPS">-</span></div>
+          <div class="analysis-item"><span style="color:var(--cyan);min-width:140px;">Sub-domains:</span> <span id="analysisSubdomains">-</span></div>
         </div>
+
         <div class="form-group">
           <div class="check-wrap">
-            <input type="checkbox" name="has_ip" value="1" class="form-check-input" id="hasIp" style="width:18px;height:18px;">
+            <input type="checkbox" name="has_ip" value="1" class="form-check-input" id="hasIp" style="width:18px;height:18px;" disabled>
             <label for="hasIp" class="form-check-label" style="color:var(--orange);"><i class="fas fa-network-wired me-2"></i>URL contains an IP address instead of domain</label>
           </div>
           <div class="check-wrap">
-            <input type="checkbox" name="has_https" value="1" class="form-check-input" id="hasHttps" checked style="width:18px;height:18px;">
+            <input type="checkbox" name="has_https" value="1" class="form-check-input" id="hasHttps" style="width:18px;height:18px;" disabled>
             <label for="hasHttps" class="form-check-label" style="color:var(--green);"><i class="fas fa-lock me-2"></i>URL uses HTTPS (secure connection)</label>
           </div>
         </div>
@@ -53,7 +62,7 @@
     <div class="c-card mb-4">
       <h5 class="mono text-cyan mb-3" style="letter-spacing:2px;font-size:.88rem;"><i class="fas fa-exclamation-circle me-2"></i>THREAT INDICATORS</h5>
       <div class="threat-indicator ti-high"><i class="fas fa-times-circle me-2"></i>Long URL + IP address = HIGH RISK</div>
-      <div class="threat-indicator ti-med"><i class="fas fa-exclamation-circle me-2"></i>Many suspicious keywords = MEDIUM RISK</div>
+      <div class="threat-indicator ti-med"><i class="fas fa-exclamation-circle me-2"></i>Many subdomains = MEDIUM RISK</div>
       <div class="threat-indicator ti-low"><i class="fas fa-check-circle me-2"></i>HTTPS + short URL = LOWER RISK</div>
     </div>
     <div class="c-card c-card-orange">
@@ -61,10 +70,49 @@
       <p class="mono" style="font-size:.78rem;color:var(--muted);line-height:1.8;">
         Algorithm: <span style="color:var(--cyan)">Gaussian Naive Bayes</span><br>
         Training samples: <span style="color:var(--cyan)">600 URLs</span><br>
-        Features: <span style="color:var(--cyan)">4 parameters</span><br>
+        Features: <span style="color:var(--cyan)">10 parameters</span><br>
         Output: <span style="color:var(--cyan)">Phishing / Legitimate</span>
       </p>
     </div>
   </div>
 </div>
+
+<script>
+  const urlInput = document.getElementById('urlInput');
+  const analysisBox = document.getElementById('urlAnalysis');
+  const form = document.getElementById('phishingForm');
+  
+  urlInput.addEventListener('input', function() {
+    const url = this.value.trim();
+    
+    if (!url) {
+      analysisBox.classList.remove('show');
+      document.getElementById('hasIp').checked = false;
+      document.getElementById('hasHttps').checked = false;
+      return;
+    }
+    
+    try {
+      const parsed = new URL(url.startsWith('http') ? url : 'https://' + url);
+      const urlLength = url.length;
+      const hasIP = /^\d+\.\d+\.\d+\.\d+$/.test(parsed.hostname);
+      const isHTTPS = parsed.protocol === 'https:';
+      const subdomainCount = parsed.hostname.split('.').length - 2;
+      
+      // Update analysis display
+      document.getElementById('analysisLength').textContent = urlLength + ' characters';
+      document.getElementById('analysisIP').textContent = hasIP ? '✓ Yes (Suspicious)' : '✗ No';
+      document.getElementById('analysisHTTPS').textContent = isHTTPS ? '✓ Yes (Secure)' : '✗ No';
+      document.getElementById('analysisSubdomains').textContent = subdomainCount;
+      
+      // Update checkboxes
+      document.getElementById('hasIp').checked = hasIP;
+      document.getElementById('hasHttps').checked = isHTTPS;
+      
+      analysisBox.classList.add('show');
+    } catch (e) {
+      analysisBox.classList.remove('show');
+    }
+  });
+</script>
 {% endblock %}

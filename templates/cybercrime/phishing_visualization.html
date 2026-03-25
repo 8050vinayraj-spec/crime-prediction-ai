@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 {% block title %}Cyber Charts — Crime AI{% endblock %}
+{% block extra_css %}
+<style>
+  .chart-wrapper { position: relative; width: 100%; height: 400px; margin-bottom: 1.5rem; }
+</style>
+{% endblock %}
 {% block content %}
 <div class="page-hdr">
   <h2><i class="fas fa-chart-pie me-2"></i>CYBER DETECTION ANALYTICS</h2>
@@ -10,13 +15,17 @@
   <div class="col-lg-5">
     <div class="c-card c-card-orange">
       <h5 class="mono text-noran mb-3" style="letter-spacing:2px;font-size:.88rem;"><i class="fas fa-chart-pie me-2"></i>THREAT SPLIT</h5>
-      <canvas id="cyberPie" height="300"></canvas>
+      <div class="chart-wrapper">
+        <canvas id="cyberPie"></canvas>
+      </div>
     </div>
   </div>
   <div class="col-lg-7">
     <div class="c-card">
       <h5 class="mono text-cyan mb-3" style="letter-spacing:2px;font-size:.88rem;"><i class="fas fa-chart-bar me-2"></i>DETECTION COUNT</h5>
-      <canvas id="cyberBar" height="300"></canvas>
+      <div class="chart-wrapper">
+        <canvas id="cyberBar"></canvas>
+      </div>
     </div>
   </div>
 </div>
@@ -27,22 +36,106 @@
 </div>
 {% endblock %}
 {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
 <script>
 const labels = {{ labels|safe }};
 const counts = {{ counts|safe }};
-Chart.defaults.color = '#3a6070';
-Chart.defaults.borderColor = 'rgba(0,245,255,0.08)';
 
-new Chart(document.getElementById('cyberPie'), {
-  type: 'pie',
-  data: { labels, datasets: [{ data: counts, backgroundColor: ['#ff073a','#39ff14'], borderColor: '#050f1c', borderWidth: 2 }] },
-  options: { responsive: true, plugins: { legend: { labels: { color: '#cce8f0', font: { family: 'Share Tech Mono' } } } } }
-});
+if (typeof Chart !== 'undefined') {
+  Chart.defaults.font.family = "'Share Tech Mono', monospace";
+  Chart.defaults.font.size = 12;
+  Chart.defaults.color = '#3a6070';
+  Chart.defaults.borderColor = 'rgba(0,245,255,0.08)';
+  Chart.defaults.responsive = true;
+  Chart.defaults.maintainAspectRatio = false;
 
-new Chart(document.getElementById('cyberBar'), {
-  type: 'bar',
-  data: { labels, datasets: [{ label: 'Detection Count', data: counts, backgroundColor: ['#ff073a','#39ff14'], borderRadius: 3 }] },
-  options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { grid: { color: 'rgba(0,245,255,0.05)' } }, y: { grid: { color: 'rgba(0,245,255,0.05)' }, ticks: { color: '#3a6070' } } } }
-});
+  // Pie Chart
+  const pieCtx = document.getElementById('cyberPie').getContext('2d');
+  new Chart(pieCtx, {
+    type: 'pie',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: counts,
+        backgroundColor: ['#ff073a', '#39ff14'],
+        borderColor: '#050f1c',
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom',
+          labels: {
+            color: '#cce8f0',
+            font: { family: "'Share Tech Mono', monospace", size: 12 },
+            padding: 15
+          }
+        },
+        tooltip: {
+          enabled: true,
+          backgroundColor: 'rgba(5,15,28,0.9)',
+          titleColor: '#00f5ff',
+          bodyColor: '#fff',
+          borderColor: '#00f5ff',
+          borderWidth: 1
+        }
+      }
+    }
+  });
+
+  // Bar Chart
+  const barCtx = document.getElementById('cyberBar').getContext('2d');
+  new Chart(barCtx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Detection Count',
+        data: counts,
+        backgroundColor: ['#ff073a', '#39ff14'],
+        borderColor: ['#ff073a', '#39ff14'],
+        borderWidth: 2,
+        borderRadius: 4,
+        hoverBackgroundColor: ['#ff073a', '#39ff14']
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          labels: {
+            color: '#00f5ff',
+            font: { weight: 'bold', size: 13 }
+          }
+        },
+        tooltip: {
+          enabled: true,
+          backgroundColor: 'rgba(5,15,28,0.9)',
+          titleColor: '#00f5ff',
+          bodyColor: '#fff',
+          borderColor: '#00f5ff',
+          borderWidth: 1
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(0,245,255,0.05)', drawBorder: false },
+          ticks: { color: '#3a6070' }
+        },
+        y: {
+          beginAtZero: true,
+          grid: { color: 'rgba(0,245,255,0.05)', drawBorder: false },
+          ticks: { color: '#3a6070' }
+        }
+      }
+    }
+  });
+}
 </script>
 {% endblock %}

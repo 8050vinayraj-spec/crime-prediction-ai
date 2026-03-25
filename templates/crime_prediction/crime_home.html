@@ -8,6 +8,7 @@
   .info-item:last-child { margin-bottom:0; }
   .info-icon { color:var(--red); width:18px; text-align:center; }
   .form-text { font-family:'Share Tech Mono',monospace; font-size:.67rem; color:var(--muted); margin-top:.25rem; letter-spacing:.5px; }
+  .alert-error { background:rgba(255,7,58,.1); border:1px solid rgba(255,7,58,.3); color:#ff073a; padding:.75rem 1rem; border-radius:4px; margin-bottom:1rem; }
 </style>
 {% endblock %}
 {% block content %}
@@ -20,21 +21,36 @@
   <div class="col-lg-7">
     <div class="c-card c-card-red">
       <h5 class="mono text-nred mb-4" style="letter-spacing:2px;font-size:.9rem;"><i class="fas fa-sliders-h me-2"></i>INPUT PARAMETERS</h5>
-      <form method="POST" action="{% url 'crime_result' %}" class="predict-form">{% csrf_token %}
+      {% if error %}
+        <div class="alert-error">
+          <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
+        </div>
+      {% endif %}
+      <form method="POST" action="{% url 'crime_result' %}" class="predict-form" id="crimeForm">{% csrf_token %}
         <div class="form-group">
           <label class="form-label">Year</label>
-          <input type="number" name="year" class="form-control" value="2024" min="2000" max="2030" required>
-          <div class="form-text">// Range: 2000 – 2030</div>
+          <input type="number" name="year" class="form-control" id="yearInput" value="{{ current_year }}" min="{{ current_year }}" max="2030" required>
+          <div class="form-text">// Range: {{ current_year }} – 2030 (Future dates only)</div>
         </div>
         <div class="form-group">
-          <label class="form-label">Month (1–12)</label>
-          <input type="number" name="month" class="form-control" placeholder="e.g. 6" min="1" max="12" required>
-          <div class="form-text">// January = 1, December = 12</div>
+          <label class="form-label">Month</label>
+          <select name="month" class="form-control" id="monthInput" required>
+            <option value="">-- Select Month --</option>
+            {% for key, month_name in months.items %}
+              <option value="{{ key }}" {% if key == current_month %}selected{% endif %}>{{ month_name }}</option>
+            {% endfor %}
+          </select>
+          <div class="form-text">// Select the prediction month</div>
         </div>
         <div class="form-group">
-          <label class="form-label">Location Code</label>
-          <input type="number" name="location" class="form-control" placeholder="e.g. 1" min="1" required>
-          <div class="form-text">// 1=Chennai  2=Mumbai  3=Delhi  4=Bangalore  5=Hyderabad</div>
+          <label class="form-label">Location</label>
+          <select name="location" class="form-control" required>
+            <option value="">-- Select Location --</option>
+            {% for code, location_name in locations.items %}
+              <option value="{{ code }}">{{ location_name }}</option>
+            {% endfor %}
+          </select>
+          <div class="form-text">// Select the city for prediction</div>
         </div>
         <button type="submit" class="btn-c btn-c-red w-100 mt-2">
           <i class="fas fa-brain me-2"></i>RUN PREDICTION
@@ -65,4 +81,44 @@
     </div>
   </div>
 </div>
+
+<script>
+  // Validate that only future dates can be selected
+  const form = document.getElementById('crimeForm');
+  const yearInput = document.getElementById('yearInput');
+  const monthInput = document.getElementById('monthInput');
+  const currentYear = {{ current_year }};
+  const currentMonth = {{ current_month }};
+
+  form.addEventListener('submit', function(e) {
+    const selectedYear = parseInt(yearInput.value);
+    const selectedMonth = parseInt(monthInput.value);
+    
+    if (selectedYear === currentYear && selectedMonth <= currentMonth) {
+      e.preventDefault();
+      alert('Please select a future month. Current month: ' + currentMonth + '/' + currentYear);
+      return false;
+    }
+  });
+
+  // Update month options based on selected year
+  yearInput.addEventListener('change', function() {
+    const selectedYear = parseInt(this.value);
+    const options = monthInput.querySelectorAll('option');
+    
+    options.forEach(option => {
+      if (option.value === '') return;
+      const monthValue = parseInt(option.value);
+      
+      if (selectedYear === currentYear && monthValue <= currentMonth) {
+        option.disabled = true;
+      } else {
+        option.disabled = false;
+      }
+    });
+  });
+
+  // Trigger change event on page load
+  yearInput.dispatchEvent(new Event('change'));
+</script>
 {% endblock %}

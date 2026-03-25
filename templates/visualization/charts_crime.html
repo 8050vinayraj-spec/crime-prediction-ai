@@ -1,5 +1,11 @@
 {% extends "base.html" %}
 {% block title %}Crime Charts — Crime AI{% endblock %}
+{% block extra_css %}
+<style>
+  .chart-wrapper { position: relative; width: 100%; height: 400px; margin-bottom: 1.5rem; }
+  .chart-wrapper-mini { position: relative; width: 100%; height: 350px; margin-bottom: 1.5rem; }
+</style>
+{% endblock %}
 {% block content %}
 <div class="page-hdr">
   <h2><i class="fas fa-chart-bar me-2"></i>CRIME PREDICTION LOG</h2>
@@ -10,13 +16,17 @@
   <div class="col-lg-8">
     <div class="c-card">
       <h5 class="mono text-cyan mb-3" style="letter-spacing:2px;font-size:.88rem;"><i class="fas fa-chart-bar me-2"></i>PREDICTIONS BY CRIME TYPE</h5>
-      <canvas id="crimeLogChart" height="300"></canvas>
+      <div class="chart-wrapper">
+        <canvas id="crimeLogChart"></canvas>
+      </div>
     </div>
   </div>
   <div class="col-lg-4">
     <div class="c-card c-card-red">
       <h5 class="mono text-nred mb-3" style="letter-spacing:2px;font-size:.88rem;"><i class="fas fa-chart-pie me-2"></i>BREAKDOWN</h5>
-      <canvas id="crimeMini" height="260"></canvas>
+      <div class="chart-wrapper-mini">
+        <canvas id="crimeMini"></canvas>
+      </div>
     </div>
   </div>
 </div>
@@ -42,23 +52,93 @@
 </div>
 {% endblock %}
 {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
 <script>
 const labels = {{ labels|safe }};
 const counts = {{ counts|safe }};
-Chart.defaults.color = '#3a6070';
-Chart.defaults.borderColor = 'rgba(0,245,255,0.08)';
 const colors = ['#ff073a','#00f5ff','#39ff14','#ff6600','#ffe600'];
 
-new Chart(document.getElementById('crimeLogChart'), {
-  type: 'bar',
-  data: { labels, datasets: [{ label: 'Predictions', data: counts, backgroundColor: colors, borderRadius: 3 }] },
-  options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { grid: { color: 'rgba(0,245,255,0.05)' } }, y: { grid: { color: 'rgba(0,245,255,0.05)' }, ticks: { color: '#3a6070' } } } }
-});
+if (typeof Chart !== 'undefined') {
+  Chart.defaults.font.family = "'Share Tech Mono', monospace";
+  Chart.defaults.font.size = 12;
+  Chart.defaults.color = '#3a6070';
+  Chart.defaults.borderColor = 'rgba(0,245,255,0.08)';
+  Chart.defaults.responsive = true;
+  Chart.defaults.maintainAspectRatio = false;
 
-new Chart(document.getElementById('crimeMini'), {
-  type: 'doughnut',
-  data: { labels, datasets: [{ data: counts, backgroundColor: colors, borderColor: '#050f1c', borderWidth: 2 }] },
-  options: { responsive: true, plugins: { legend: { labels: { color: '#cce8f0', font: { family: 'Share Tech Mono', size: 10 } } } } }
-});
+  // Bar Chart
+  const barCtx = document.getElementById('crimeLogChart').getContext('2d');
+  new Chart(barCtx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Predictions',
+        data: counts,
+        backgroundColor: colors,
+        borderColor: colors,
+        borderWidth: 2,
+        borderRadius: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, labels: { color: '#00f5ff', font: { weight: 'bold' } } },
+        tooltip: {
+          enabled: true,
+          backgroundColor: 'rgba(5,15,28,0.9)',
+          titleColor: '#00f5ff',
+          bodyColor: '#fff',
+          borderColor: '#00f5ff',
+          borderWidth: 1
+        }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(0,245,255,0.05)' }, ticks: { color: '#3a6070' } },
+        y: { grid: { color: 'rgba(0,245,255,0.05)' }, ticks: { color: '#3a6070' } }
+      }
+    }
+  });
+
+  // Doughnut Chart
+  const doughnutCtx = document.getElementById('crimeMini').getContext('2d');
+  new Chart(doughnutCtx, {
+    type: 'doughnut',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: counts,
+        backgroundColor: colors,
+        borderColor: '#050f1c',
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom',
+          labels: {
+            color: '#cce8f0',
+            font: { family: "'Share Tech Mono', monospace", size: 11 },
+            padding: 10
+          }
+        },
+        tooltip: {
+          enabled: true,
+          backgroundColor: 'rgba(5,15,28,0.9)',
+          titleColor: '#00f5ff',
+          bodyColor: '#fff',
+          borderColor: '#00f5ff',
+          borderWidth: 1
+        }
+      }
+    }
+  });
+}
 </script>
 {% endblock %}

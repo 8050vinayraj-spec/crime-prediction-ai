@@ -1,5 +1,12 @@
 {% extends "base.html" %}
 {% block title %}Crime Charts — Crime AI{% endblock %}
+{% block extra_css %}
+<style>
+  .chart-container { position: relative; width: 100%; height: 100%; }
+  .chart-wrapper { position: relative; width: 100%; height: 400px; margin-bottom: 1.5rem; }
+  .chart-wrapper-small { position: relative; width: 100%; height: 350px; margin-bottom: 1.5rem; }
+</style>
+{% endblock %}
 {% block content %}
 <div class="page-hdr">
   <h2><i class="fas fa-chart-bar me-2"></i>CRIME DISTRIBUTION</h2>
@@ -10,13 +17,17 @@
   <div class="col-lg-8">
     <div class="c-card">
       <h5 class="mono text-cyan mb-3" style="letter-spacing:2px;font-size:.88rem;"><i class="fas fa-chart-bar me-2"></i>CRIME TYPE FREQUENCY</h5>
-      <canvas id="crimeChart" height="300"></canvas>
+      <div class="chart-wrapper">
+        <canvas id="crimeChart"></canvas>
+      </div>
     </div>
   </div>
   <div class="col-lg-4">
     <div class="c-card c-card-red">
       <h5 class="mono text-nred mb-3" style="letter-spacing:2px;font-size:.88rem;"><i class="fas fa-chart-pie me-2"></i>DISTRIBUTION</h5>
-      <canvas id="crimePie" height="280"></canvas>
+      <div class="chart-wrapper-small">
+        <canvas id="crimePie"></canvas>
+      </div>
     </div>
   </div>
 </div>
@@ -27,23 +38,109 @@
 </div>
 {% endblock %}
 {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
 <script>
 const labels = {{ labels|safe }};
 const counts = {{ counts|safe }};
 const neonColors = ['#ff073a','#00f5ff','#39ff14','#ff6600','#ffe600','#bf5fff'];
-Chart.defaults.color = '#3a6070';
-Chart.defaults.borderColor = 'rgba(0,245,255,0.08)';
 
-new Chart(document.getElementById('crimeChart'), {
-  type: 'bar',
-  data: { labels, datasets: [{ label: 'Crime Count', data: counts, backgroundColor: neonColors, borderColor: neonColors, borderWidth: 1, borderRadius: 3 }] },
-  options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { grid: { color: 'rgba(0,245,255,0.05)' } }, y: { grid: { color: 'rgba(0,245,255,0.05)' }, ticks: { color: '#3a6070' } } } }
-});
+// Ensure Chart.js is loaded
+if (typeof Chart !== 'undefined') {
+  Chart.defaults.font.family = "'Share Tech Mono', monospace";
+  Chart.defaults.font.size = 12;
+  Chart.defaults.color = '#3a6070';
+  Chart.defaults.borderColor = 'rgba(0,245,255,0.08)';
+  Chart.defaults.responsive = true;
+  Chart.defaults.maintainAspectRatio = false;
 
-new Chart(document.getElementById('crimePie'), {
-  type: 'doughnut',
-  data: { labels, datasets: [{ data: counts, backgroundColor: neonColors, borderColor: '#050f1c', borderWidth: 2 }] },
-  options: { responsive: true, plugins: { legend: { labels: { color: '#cce8f0', font: { family: 'Share Tech Mono' } } } } }
-});
+  // Bar Chart
+  const barCtx = document.getElementById('crimeChart').getContext('2d');
+  new Chart(barCtx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Crime Count',
+        data: counts,
+        backgroundColor: neonColors,
+        borderColor: neonColors,
+        borderWidth: 2,
+        borderRadius: 4,
+        hoverBackgroundColor: neonColors
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      indexAxis: 'x',
+      plugins: {
+        legend: {
+          display: true,
+          labels: {
+            color: '#00f5ff',
+            font: { weight: 'bold', size: 13 }
+          }
+        },
+        tooltip: {
+          enabled: true,
+          backgroundColor: 'rgba(5,15,28,0.9)',
+          titleColor: '#00f5ff',
+          bodyColor: '#fff',
+          borderColor: '#00f5ff',
+          borderWidth: 1
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(0,245,255,0.05)', drawBorder: false },
+          ticks: { color: '#3a6070' }
+        },
+        y: {
+          beginAtZero: true,
+          grid: { color: 'rgba(0,245,255,0.05)', drawBorder: false },
+          ticks: { color: '#3a6070' }
+        }
+      }
+    }
+  });
+
+  // Doughnut Chart
+  const pieCtx = document.getElementById('crimePie').getContext('2d');
+  new Chart(pieCtx, {
+    type: 'doughnut',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: counts,
+        backgroundColor: neonColors,
+        borderColor: '#050f1c',
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom',
+          labels: {
+            color: '#cce8f0',
+            font: { family: "'Share Tech Mono', monospace", size: 12 },
+            padding: 15
+          }
+        },
+        tooltip: {
+          enabled: true,
+          backgroundColor: 'rgba(5,15,28,0.9)',
+          titleColor: '#00f5ff',
+          bodyColor: '#fff',
+          borderColor: '#00f5ff',
+          borderWidth: 1
+        }
+      }
+    }
+  });
+}
 </script>
 {% endblock %}
