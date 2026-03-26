@@ -1,0 +1,848 @@
+<!--
+CRIME PREDICTION & CYBERCRIME DETECTION SYSTEM
+HTML Templates & Frontend Code
+
+This file contains all HTML templates from the project,
+organized by module and functionality.
+
+Date: March 26, 2026
+Version: 1.0
+-->
+
+<!-- ============================================================================
+SECTION 1: CRIME PREDICTION HOME PAGE
+============================================================================ -->
+
+<!-- templates/crime_prediction/crime_home.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crime Prediction - Crime Prediction & Cybercrime Detection System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+</head>
+<body>
+    {% extends 'base.html' %}
+    
+    {% block content %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h2 class="mb-4">Crime Prediction Analysis</h2>
+                
+                {% if error %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ error }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endif %}
+                
+                <div class="card shadow">
+                    <div class="card-body">
+                        <form method="POST" class="needs-validation" novalidate>
+                            {% csrf_token %}
+                            
+                            <!-- State Selection -->
+                            <div class="mb-3">
+                                <label for="state" class="form-label">Select State/UT:</label>
+                                <select name="state" id="state" class="form-select" required>
+                                    <option value="">-- Choose a State --</option>
+                                    <option value="Maharashtra">Maharashtra</option>
+                                    <option value="Delhi">Delhi</option>
+                                    <option value="Karnataka">Karnataka</option>
+                                    <option value="Tamil Nadu">Tamil Nadu</option>
+                                    <option value="Gujarat">Gujarat</option>
+                                    <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                    <option value="West Bengal">West Bengal</option>
+                                    <option value="Rajasthan">Rajasthan</option>
+                                    <option value="Punjab">Punjab</option>
+                                    <option value="Haryana">Haryana</option>
+                                    <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                    <option value="Telangana">Telangana</option>
+                                    <option value="Kerala">Kerala</option>
+                                    <option value="Jharkhand">Jharkhand</option>
+                                    <option value="Chhattisgarh">Chhattisgarh</option>
+                                    <option value="Odisha">Odisha</option>
+                                    <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                    <option value="Bihar">Bihar</option>
+                                    <option value="Uttarakhand">Uttarakhand</option>
+                                    <option value="Himachal Pradesh">Himachal Pradesh</option>
+                                    <option value="Assam">Assam</option>
+                                    <option value="Tripura">Tripura</option>
+                                    <option value="Nagaland">Nagaland</option>
+                                    <option value="Manipur">Manipur</option>
+                                    <option value="Mizoram">Mizoram</option>
+                                    <option value="Meghalaya">Meghalaya</option>
+                                    <option value="Sikkim">Sikkim</option>
+                                    <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                                    <option value="Goa">Goa</option>
+                                    <option value="Chandigarh">Chandigarh</option>
+                                    <option value="Delhi">Delhi (UT)</option>
+                                    <option value="Puducherry">Puducherry</option>
+                                    <option value="Andaman and Nicobar">Andaman and Nicobar</option>
+                                </select>
+                                <div class="invalid-feedback">Please select a state.</div>
+                            </div>
+                            
+                            <!-- Month Selection -->
+                            <div class="mb-3">
+                                <label for="month" class="form-label">Select Month:</label>
+                                <select name="month" id="month" class="form-select" required>
+                                    <option value="">-- Choose a Month --</option>
+                                    <option value="1">January</option>
+                                    <option value="2">February</option>
+                                    <option value="3">March</option>
+                                    <option value="4">April</option>
+                                    <option value="5">May</option>
+                                    <option value="6">June</option>
+                                    <option value="7">July</option>
+                                    <option value="8">August</option>
+                                    <option value="9">September</option>
+                                    <option value="10">October</option>
+                                    <option value="11">November</option>
+                                    <option value="12">December</option>
+                                </select>
+                                <div class="invalid-feedback">Please select a month.</div>
+                            </div>
+                            
+                            <!-- Year Selection -->
+                            <div class="mb-3">
+                                <label for="year" class="form-label">Select Year:</label>
+                                <input type="number" name="year" id="year" class="form-control" 
+                                       min="2026" required placeholder="2026">
+                                <small class="text-muted">Note: Only future dates are allowed for predictions</small>
+                                <div class="invalid-feedback">Please enter a future year.</div>
+                            </div>
+                            
+                            <!-- Submit Button -->
+                            <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">
+                                <i class="fas fa-chart-bar"></i> Predict Crime
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Info Section -->
+                <div class="mt-4 p-3 bg-light border rounded">
+                    <h5>How it Works:</h5>
+                    <ul class="mb-0">
+                        <li>Select a state or union territory from the 33 regions</li>
+                        <li>Choose the month and year for prediction</li>
+                        <li>The AI model analyzes historical crime patterns</li>
+                        <li>View predicted crime type, probability, and distribution</li>
+                        <li>Download heatmap visualization for geographic analysis</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock %}
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Form validation
+        (function () {
+            'use strict';
+            window.addEventListener('load', function () {
+                var forms = document.querySelectorAll('.needs-validation');
+                Array.prototype.slice.call(forms).forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+    </script>
+</body>
+</html>
+
+
+<!-- ============================================================================
+SECTION 2: CRIME PREDICTION RESULTS PAGE
+============================================================================ -->
+
+<!-- templates/crime_prediction/crime_result.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Results - Crime Prediction System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+</head>
+<body>
+    {% extends 'base.html' %}
+    
+    {% block content %}
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-12">
+                <h2 class="mb-4">Crime Prediction Results</h2>
+            </div>
+        </div>
+        
+        <div class="row mb-4">
+            <!-- Prediction Details -->
+            <div class="col-lg-6">
+                <div class="card shadow mb-3">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Prediction Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="text-muted">Location:</label>
+                            <p class="fs-5"><strong>{{ state }}</strong></p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="text-muted">Month/Year:</label>
+                            <p class="fs-5"><strong>{{ month }}/{{ year }}</strong></p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="text-muted">Predicted Crime Type:</label>
+                            <p class="fs-5"><strong>
+                                <span class="badge bg-danger">{{ prediction }}</span>
+                            </strong></p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="text-muted">Prediction Probability:</label>
+                            <p class="fs-5"><strong>{{ probability }}</strong></p>
+                        </div>
+                        <div class="mb-0">
+                            <label class="text-muted">Confidence Level:</label>
+                            <p class="fs-5">
+                                {% if confidence == 'High' %}
+                                    <span class="badge bg-success">{{ confidence }}</span>
+                                {% elif confidence == 'Medium' %}
+                                    <span class="badge bg-warning">{{ confidence }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ confidence }}</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Probability Distribution Chart -->
+            <div class="col-lg-6">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Crime Type Distribution</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="distributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="row mt-4">
+            <div class="col-lg-12">
+                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                    <button type="button" class="btn btn-primary btn-lg" onclick="downloadHeatmap()">
+                        <i class="fas fa-download"></i> Download Heatmap
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-lg" onclick="generateReport()">
+                        <i class="fas fa-file-pdf"></i> Generate Report
+                    </button>
+                    <a href="{% url 'crime_home' %}" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-arrow-left"></i> Back to Prediction
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Create distribution chart
+        const ctx = document.getElementById('distributionChart').getContext('2d');
+        const distribution = {{ distribution|safe }};
+        
+        const labels = Object.keys(distribution);
+        const data = Object.values(distribution).map(val => (val * 100).toFixed(1));
+        
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: [
+                        '#dc3545', '#ffc107', '#17a2b8', 
+                        '#6c757d', '#28a745'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+        
+        function downloadHeatmap() {
+            alert('Heatmap download functionality - to be implemented');
+        }
+        
+        function generateReport() {
+            alert('Report generation - to be implemented');
+        }
+    </script>
+    {% endblock %}
+</body>
+</html>
+
+
+<!-- ============================================================================
+SECTION 3: PHISHING ANALYSIS HOME PAGE
+============================================================================ -->
+
+<!-- templates/cybercrime/phishing_home.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phishing Detection - Crime Prediction & Cybercrime Detection System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    {% extends 'base.html' %}
+    
+    {% block content %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h2 class="mb-4">Phishing URL Detection</h2>
+                
+                {% if error %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ error }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endif %}
+                
+                <div class="card shadow mb-4">
+                    <div class="card-body">
+                        <form method="POST" class="needs-validation" novalidate>
+                            {% csrf_token %}
+                            
+                            <!-- URL Input -->
+                            <div class="mb-3">
+                                <label for="url" class="form-label">Enter URL to Analyze:</label>
+                                <input type="url" name="url" id="url" class="form-control form-control-lg" 
+                                       placeholder="https://example.com" required>
+                                <div class="invalid-feedback">Please enter a valid URL.</div>
+                            </div>
+                            
+                            <!-- Submit Button -->
+                            <button type="submit" class="btn btn-danger btn-lg w-100 mt-3">
+                                <i class="fas fa-search"></i> Analyze URL
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Features Explained -->
+                <div class="card shadow">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">Analysis Features</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>The system analyzes URLs using 10 advanced features:</p>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <h6><i class="fas fa-link"></i> URL Length</h6>
+                                <small>Suspicious URLs often have unusual lengths</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h6><i class="fas fa-shield-alt"></i> HTTPS Protocol</h6>
+                                <small>Legitimate sites use secure HTTPS connections</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h6><i class="fas fa-exclamation-triangle"></i> IP Address</h6>
+                                <small>Phishing URLs often use raw IP addresses</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h6><i class="fas fa-font"></i> Keywords</h6>
+                                <small>Detection of suspicious keywords in URLs</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h6><i class="fas fa-sitemap"></i> Subdomains</h6>
+                                <small>Excessive subdomains indicate potential threats</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h6><i class="fas fa-certificate"></i> SSL Certificate</h6>
+                                <small>Verification of valid SSL certificates</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Form validation
+        (function () {
+            'use strict';
+            window.addEventListener('load', function () {
+                var forms = document.querySelectorAll('.needs-validation');
+                Array.prototype.slice.call(forms).forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+    </script>
+    {% endblock %}
+</body>
+</html>
+
+
+<!-- ============================================================================
+SECTION 4: PHISHING ANALYSIS RESULTS PAGE
+============================================================================ -->
+
+<!-- templates/cybercrime/phishing_result.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Results - Phishing Detection</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    {% extends 'base.html' %}
+    
+    {% block content %}
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-12">
+                <h2 class="mb-4">Phishing Analysis Results</h2>
+            </div>
+        </div>
+        
+        <!-- Risk Level Alert -->
+        <div class="row mb-4">
+            <div class="col-lg-12">
+                {% if risk_level == 'HIGH' %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <h4 class="alert-heading">⚠️ High Risk - Potential Phishing</h4>
+                        <p>{{ recommendation }}</p>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% elif risk_level == 'MEDIUM' %}
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <h4 class="alert-heading">⚡ Medium Risk</h4>
+                        <p>{{ recommendation }}</p>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% else %}
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <h4 class="alert-heading">✓ Low Risk - Safe to Visit</h4>
+                        <p>{{ recommendation }}</p>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Analysis Details -->
+        <div class="row mb-4">
+            <div class="col-lg-6">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Analysis Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="text-muted">Analyzed URL:</label>
+                            <p class="small text-break"><code>{{ url }}</code></p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="text-muted">Classification:</label>
+                            <p>
+                                {% if classification == 'Phishing' %}
+                                    <span class="badge bg-danger">{{ classification }}</span>
+                                {% else %}
+                                    <span class="badge bg-success">{{ classification }}</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="text-muted">Confidence Score:</label>
+                            <p><strong>{{ confidence }}</strong></p>
+                        </div>
+                        <div class="mb-0">
+                            <label class="text-muted">Risk Level:</label>
+                            <p>
+                                {% if risk_level == 'HIGH' %}
+                                    <span class="badge bg-danger">{{ risk_level }}</span>
+                                {% elif risk_level == 'MEDIUM' %}
+                                    <span class="badge bg-warning">{{ risk_level }}</span>
+                                {% else %}
+                                    <span class="badge bg-success">{{ risk_level }}</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Extracted Features -->
+            <div class="col-lg-6">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Extracted Features</h5>
+                    </div>
+                    <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                        <table class="table table-sm">
+                            <tbody>
+                                <tr>
+                                    <td><strong>URL Length</strong></td>
+                                    <td>{{ features.url_length }} chars</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Has IP Address</strong></td>
+                                    <td>{{ features.has_ip }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Has HTTPS</strong></td>
+                                    <td>{{ features.has_https }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Suspicious Keywords</strong></td>
+                                    <td>{{ features.suspicious_keywords }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Subdomain Count</strong></td>
+                                    <td>{{ features.subdomain_count }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Domain Age (days)</strong></td>
+                                    <td>{{ features.domain_age_days }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>SSL Certificate</strong></td>
+                                    <td>{{ features.ssl_certificate }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Page Rank</strong></td>
+                                    <td>{{ features.page_rank }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>WHOIS Age</strong></td>
+                                    <td>{{ features.whois_age }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Redirect Count</strong></td>
+                                    <td>{{ features.redirect_count }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="row mt-4">
+            <div class="col-lg-12">
+                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                    <button type="button" class="btn btn-primary btn-lg" onclick="reportPhishing()">
+                        <i class="fas fa-flag"></i> Report Phishing
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-lg" onclick="viewHistory()">
+                        <i class="fas fa-history"></i> View History
+                    </button>
+                    <a href="{% url 'phishing_home' %}" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-arrow-left"></i> Analyze Another URL
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function reportPhishing() {
+            alert('Thank you for reporting this phishing URL. It will be reviewed.');
+        }
+        
+        function viewHistory() {
+            window.location.href = "{% url 'phishing_history' %}";
+        }
+    </script>
+    {% endblock %}
+</body>
+</html>
+
+
+<!-- ============================================================================
+SECTION 5: BASE TEMPLATE & COMMON ELEMENTS
+============================================================================ -->
+
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Crime Prediction & Cybercrime Detection System{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --danger-color: #dc3545;
+            --success-color: #28a745;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #0056b3 100%);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .card {
+            border: none;
+            border-radius: 8px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #0056b3 100%);
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #0056b3 0%, #003d82 100%);
+        }
+        
+        .badge {
+            font-size: 0.85rem;
+            padding: 0.4rem 0.6rem;
+        }
+        
+        footer {
+            background-color: #343a40;
+            color: #fff;
+            margin-top: 50px;
+            padding: 30px 0;
+        }
+        
+        .alert {
+            border-radius: 8px;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="{% url 'home' %}">
+                <i class="fas fa-shield-alt"></i> Crime & Cyber Detection
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}">Home</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'crime_home' %}">Crime Prediction</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'phishing_home' %}">Phishing Detection</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout' %}">Logout ({{ user.username }})</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'register' %}">Register</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <h5>About Us</h5>
+                    <p>Advanced AI-powered system for crime prediction and cybersecurity threat detection.</p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'about' %}" class="text-decoration-none">About</a></li>
+                        <li><a href="{% url 'contact' %}" class="text-decoration-none">Contact</a></li>
+                        <li><a href="#" class="text-decoration-none">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5>Features</h5>
+                    <ul class="list-unstyled">
+                        <li>Crime Prediction (54.10% accuracy)</li>
+                        <li>Phishing Detection (96.5% accuracy)</li>
+                        <li>Real-time Analytics</li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+            <p class="text-center mb-0">&copy; 2026 Crime Prediction & Cybercrime Detection System. All rights reserved.</p>
+        </div>
+    </footer>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>
+
+
+<!-- ============================================================================
+SECTION 6: JAVASCRIPT UTILITIES
+============================================================================ -->
+
+<!-- static/js/main.js -->
+<script>
+    // Utility Functions for Crime Prediction & Cybercrime Detection System
+    
+    console.log('Crime Prediction & Cybercrime Detection System - Loaded');
+    
+    // Theme Toggle
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+        
+        // Initialize popovers
+        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+        var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+            return new bootstrap.Popover(popoverTriggerEl);
+        });
+    });
+    
+    // API Call Functions
+    async function fetchPrediction(state, month, year) {
+        try {
+            const response = await fetch('/api/predict/crime/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({
+                    state: state,
+                    month: month,
+                    year: year
+                })
+            });
+            
+            if (!response.ok) throw new Error('Network response was not ok');
+            return await response.json();
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+    
+    async function analyzePhishing(url) {
+        try {
+            const response = await fetch('/api/analyze/phishing/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({
+                    url: url
+                })
+            });
+            
+            if (!response.ok) throw new Error('Network response was not ok');
+            return await response.json();
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+    
+    // Utility Functions
+    function showAlert(message, type = 'info') {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+        alertDiv.role = 'alert';
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.querySelector('main').insertBefore(alertDiv, document.querySelector('main').firstChild);
+    }
+    
+    function formatDate(date) {
+        return new Date(date).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    }
+    
+    function formatTime(date) {
+        return new Date(date).toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+</script>
